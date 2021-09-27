@@ -48,7 +48,7 @@
                         </el-form-item>
                         <el-form-item label="过滤条件">
                             <div style="color:#999999;background: #f2f2f2;border: 1px solid #ddd;padding: 0 20px;font-size: 10px;">过滤条件可参考一键搜索语法，示例：severity>=3 | status=10 | print id,name,class</div>
-                            <Editor
+                            <VueEditor
                                 v-model="view.model.datasource.filter"
                                 @init="onEditorInit"
                                 :lang="text"
@@ -57,7 +57,7 @@
                                 height="20vh"
                                 style="border:1px solid #f2f2f2;border-left: unset;"
                                 ref="datasourceEditor"
-                            ></Editor>
+                            ></VueEditor>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onTestDataSource" :loading="editor.loading">测试数据源</el-button>
@@ -116,7 +116,7 @@ export default {
   components:{
     TableView,
     ActionView,
-    Editor:require("vue2-ace-editor"),
+    VueEditor: require("vue2-ace-editor"),
     TagView,
     TransferView
   },

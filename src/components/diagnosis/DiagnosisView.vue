@@ -20,13 +20,6 @@
 
 <script>
 import InfoView from './InfoView.vue';
-import JournalView from './JournalView.vue';
-import AttributeRelView from './AttributeRelView.vue';
-import HistoryView from './HistoryView.vue';
-import GraphView from './GraphView.vue';
-import AttachmentView from './AttachmentView.vue';
-import BitLogView from '../bitlog/MainView.vue';
-import TsdbView from '../tsdb/MainView.vue';
 
 export default {
   name: "DiagnosisView",
@@ -36,13 +29,13 @@ export default {
   },
   components:{
     InfoView,
-    JournalView,
-    AttributeRelView,
-    HistoryView,
-    GraphView,
-    AttachmentView,
-    BitLogView,
-    TsdbView
+    JournalView: resolve => {require(['./JournalView.vue'], resolve)},
+    AttributeRelView: resolve => {require(['./AttributeRelView.vue'], resolve)},
+    HistoryView: resolve => {require(['./HistoryView.vue'], resolve)},
+    GraphView: resolve => {require(['./GraphView.vue'], resolve)},
+    AttachmentView: resolve => {require(['./AttachmentView.vue'], resolve)},
+    BitLogView: resolve => {require(['../bitlog/MainView.vue'], resolve)},
+    TsdbView: resolve => {require(['../tsdb/MainView.vue'], resolve)}
   },
   data() {
     return {

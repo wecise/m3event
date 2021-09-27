@@ -20,7 +20,7 @@
             </el-tooltip>
         </el-header>
         <el-main>
-            <editor
+            <VueEditor
                 v-model="editor.content"
                 @init="onEditorInit"
                 :lang="editor.lang.value"
@@ -29,7 +29,7 @@
                 height="calc(100vh - 370px)"
                 style="border:1px solid #f2f2f2;"
                 ref="editorRef"
-            ></editor>
+            ></VueEditor>
         </el-main>
     </el-container>
       
@@ -59,7 +59,7 @@ export default {
         }
     },
     components:{
-        editor:require("vue2-ace-editor")
+        VueEditor: require("vue2-ace-editor")
     },
     created(){
         this.m3.callFS("/matrix/config/modeList.js",null).then( (rtn)=>{

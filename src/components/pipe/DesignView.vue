@@ -282,7 +282,7 @@
                     </el-button>
                 </el-header>
                 <el-main style="overflow:hidden;">
-                    <Editor
+                    <VueEditor
                         v-model="dialog.cron.data.value"
                         @init="onCronEditorInit"
                         :lang="dialog.cron.editor.lang.value"
@@ -290,7 +290,7 @@
                         width="100%"
                         height="calc(100vh - 350px)"
                         style="border:1px solid #f2f2f2;"
-                    ></Editor>
+                    ></VueEditor>
                 </el-main>
             </el-container>
         </el-dialog>
@@ -299,7 +299,6 @@
 
 <script>
     import _ from 'lodash';
-    import $ from 'jquery';
     import RuleTree from '../rule/TreeView';
     import TestView from '../rule/TestView';
     import LogView from '../consolelog/LogView';
@@ -313,7 +312,7 @@
             model: Object
         },
         components:{
-            Editor:require("vue2-ace-editor"),
+            VueEditor: require("vue2-ace-editor"),
             RuleTree,
             LogView,
             TestView
@@ -1345,7 +1344,7 @@
                 let graph = this.editor.graph;
                 let sourcebar = this.$refs[sidebar].$el;
 
-                $(sourcebar).empty();
+                document.querySelector(sourcebar).remove();
 
                 _.forEach(item, (v)=>{
                     let url = [this.assetsPath,v.fileContent.icon.url].join("/");

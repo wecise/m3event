@@ -236,7 +236,7 @@
 <script>
 
 import _ from 'lodash';
-import $ from 'jquery';
+
 import {Howl} from 'howler';
 import Cookies from 'js-cookie';
 import VueContext from 'vue-context';
@@ -513,7 +513,7 @@ export default {
             return _.includes(this.dt.selectedSeverity,key)?'severity-active':'';
         },
         onToolsCommand(){
-            $(".el-dropdown-menu.el-popper.el-dropdown-menu--small").hide();
+            document.querySelector(".el-dropdown-menu.el-popper.el-dropdown-menu--small").style.display = 'none';
         },
         onToggleSeverity(btn,key){
             this.dt.selectedSeverity = _.xor(this.dt.selectedSeverity,[key]);
@@ -775,12 +775,15 @@ export default {
                         
                         this.$refs.table.toggleRowSelection(data[index], true);
                         this.dt.selected.push(data[index]);
-                        $(`.el-table .row-${index}`).addClass("current-row");
+
+                        let el = document.querySelector(`.el-table .${this.rowClass}-row-${index}`);
+                        if(el) el.classList.add("current-row");
                         i++;
 
                     }
                     setTimeout(()=>{
-                        $(`.el-table .row-${min}`).addClass("current-row");
+                        let el = document.querySelector(`.el-table .${this.rowClass}-row-${min}`);
+                        if(el) el.classList.add("current-row");
                     },50)
                 } else {
                     // this.dt.origin = row.index; // 没按住记录起点
@@ -795,7 +798,11 @@ export default {
             if (!this.dt.pin) {
                 this.$refs.table.clearSelection();
                 this.dt.selected = [];
-                $(`.el-table .current-row`).removeClass("current-row");
+
+                let el = document.querySelectorAll(`.el-table .current-row`);
+                el.forEach(e=>{
+                    e.classList.remove("current-row");
+                })
             }
         },
         onToggle(){

@@ -88,7 +88,7 @@
             </el-button-group>
         </el-header>
         <el-main style="padding:0px;overflow: hidden;" ref="editor">
-            <Editor
+            <VueEditor
                 v-model="editor.data"
                 @init="onEditorInit"
                 :lang="editor.lang.value"
@@ -96,7 +96,7 @@
                 width="99.8%"
                 height="15vh"
                 style="border:1px solid #f2f2f2;"
-            ></Editor>
+            ></VueEditor>
         </el-main>
         <el-footer :id="id+'_statusBar'" style="height:30px;line-height: 30px;" ref="statusBar"></el-footer>
     </el-container>
@@ -112,7 +112,7 @@
             model: Object
         },
         components:{
-            Editor:require("vue2-ace-editor")
+            VueEditor: require("vue2-ace-editor")
         },  
         data(){
             return {

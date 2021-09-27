@@ -72,7 +72,6 @@
 import 'mxgraph/javascript/src/css/common.css';
 
 import _ from 'lodash';
-import $ from 'jquery';
 import mxgraph from './mxGraph.js';
 const {mxEditor,mxGraph,mxConstants,mxPanningHandler,mxGraphHandler,mxGuide,mxEdgeHandler,mxClient,mxRectangleShape,mxRubberband,mxCellOverlay,mxOutline,mxImage,mxPoint,mxEdgeStyle,mxCellTracker,mxUtils,mxCodec,mxEvent,mxHierarchicalLayout,mxMorphing,mxFastOrganicLayout,mxCompactTreeLayout,mxCircleLayout} = mxgraph;
 
@@ -551,7 +550,7 @@ export default {
     },
     onReload(){
         try{
-            $(this.$refs.graphContainer.$el).empty();
+            document.querySelector(this.$refs.graphContainer.$el).remove();
             
             // 清空
             this.graph.editor.execute("selectAll");

@@ -1,12 +1,12 @@
 <template>
 
   <div class="m3 event-console">
-    <Header :auth="auth" v-if="auth && layout.header.show" class="header"></Header>
+    <Header :auth="auth" class="header" v-if="auth && layout.header.show"></Header>
     <div :class="layout.header.show ? 'main' : 'main-fullscreen'">
-      <SideBar v-if="auth && layout.sidebar.show" class="sidebar" :auth="auth" :global="global"></SideBar>
-      <MainView :global="global" v-if="global" class="content"></MainView>
+      <SideBar class="sidebar" :auth="auth" :global="global" v-if="auth && layout.sidebar.show" ></SideBar>
+      <MainView :global="global" class="content" v-if="global"></MainView>
     </div>
-    <Footer :auth="auth" v-if="auth && layout.footer.show" class="footer"></Footer>
+    <Footer :auth="auth" class="footer" v-if="auth && layout.footer.show"></Footer>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ export default {
     Header,
     SideBar,
     Footer,
-    MainView
+    MainView//: resolve => {require(['./components/MainView.vue'], resolve)}
   },
   data(){
     return {
@@ -43,11 +43,12 @@ export default {
     }
   },
   mounted(){
+    
     setTimeout(()=>{
       this.global = this.m3.global;
       this.auth = this.m3.auth.signedUser;
-    },1500)
-
+    },2000)
+    
     this.eventHub.$on("layout-change",(data)=>{
       this.layout = data;
     })

@@ -24,7 +24,7 @@
             </el-dropdown>
         </el-header>
         <el-main :loading="editor.loading" style="padding:0px;overflow:hidden;">
-            <Editor
+            <VueEditor
                 v-model="editor.data"
                 @init="onEditorInit"
                 :lang="editor.lang.value"
@@ -32,7 +32,7 @@
                 width="99.8%"
                 height="100%"
                 style="border:1px solid #f2f2f2;"
-                ref="editor"></Editor>
+                ref="editor"></VueEditor>
         </el-main>
     </el-container>
 </template>
@@ -82,7 +82,7 @@ export default{
         }
     },
     components:{
-        Editor:require("vue2-ace-editor")
+        VueEditor: require("vue2-ace-editor")
     },
     mounted(){
         this.init();

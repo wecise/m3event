@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import _ from 'lodash/core';
 import TagView from '../tags/TagView';
 
 export default {

@@ -57,7 +57,7 @@
                                 </el-tooltip>
                             </el-header>
                             <el-main>
-                                <Editor
+                                <VueEditor
                                     v-model="editor.data"
                                     @init="onEditorInit"
                                     :lang="editor.lang.value"
@@ -65,7 +65,7 @@
                                     width="99.8%"
                                     height="100%"
                                     ref="editor"
-                                ></Editor>
+                                ></VueEditor>
                             </el-main>
                         </el-container>
                         <el-button type="text" slot="reference">
@@ -203,7 +203,7 @@ export default {
     model: Object
   },
   components:{
-    Editor:require("vue2-ace-editor"),
+    VueEditor: require("vue2-ace-editor"),
     TagView,
     HotTable
   },

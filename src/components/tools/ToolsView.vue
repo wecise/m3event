@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import _ from 'lodash/core';
 
 export default({
     name: "ToolsView",
@@ -40,7 +40,7 @@ export default({
                     if(this.m3.auth.signedUser.isadmin){ 
                         return v;
                     } else {
-                        return v['id'] === 'smartGroupView';//!_.includes(['fsView','pipeView'],v.id);
+                        return v['id'] === 'smartGroupView';
                     }
                 })
             })

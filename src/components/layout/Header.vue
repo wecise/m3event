@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import _startsWith from 'lodash/startsWith';
 import Cookies from 'js-cookie';
 import MessageView from '../../components/message/MessageView';
 
@@ -91,7 +91,7 @@ export default{
     },
     methods: {
         onSelect(key) {
-            if(_.startsWith(key,'/matrix/')){
+            if(_startsWith(key,'/matrix/')){
                 window.open(key, '_blank');
             } else {
                 if(key === 'home'){

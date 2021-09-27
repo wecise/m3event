@@ -91,7 +91,7 @@
                                             {{code.name}}
                                         </el-button>
                                     </div>
-                                    <Editor
+                                    <VueEditor
                                         v-model="scope.row[item.field]"
                                         @init="onEditorInit"
                                         :lang="editor.lang.value"
@@ -99,7 +99,7 @@
                                         width="99.8%"
                                         height="calc(100% - 40px)"
                                         style="border:1px solid #f2f2f2;"
-                                    ></Editor>
+                                    ></VueEditor>
                                     <el-button slot="reference" type="text">属性渲染</el-button>
                                 </el-popover>
 
@@ -134,7 +134,7 @@ export default({
         buttonTexts: Array
     },
     components: {
-        Editor:require("vue2-ace-editor"),
+        VueEditor: require("vue2-ace-editor"),
     },
     data(){
         return {

@@ -78,7 +78,7 @@
                             </el-dropdown-menu>
                         </el-dropdown>
                     </el-tooltip>
-                    <Editor
+                    <VueEditor
                         v-model="dialog.newTrigger.data.script"
                         @init="onEditorInit"
                         :lang="editor.lang.value"
@@ -87,7 +87,7 @@
                         height="calc(75vh - 270px)"
                         style="border:1px solid #f2f2f2;"
                         ref="editor"
-                    ></Editor>
+                    ></VueEditor>
                 </el-form-item>
                 <el-form-item>
                           
@@ -150,7 +150,7 @@
                                 </el-dropdown-menu>
                             </el-dropdown>
                         </el-tooltip>
-                          <Editor
+                          <VueEditor
                               v-model="dialog.newTrigger.data.script"
                               @init="onEditorInit"
                               :lang="editor.lang.value"
@@ -159,7 +159,7 @@
                               height="calc(75vh - 360px)"
                               style="border:1px solid #f2f2f2;"
                               ref="editor"
-                          ></Editor>
+                          ></VueEditor>
                       </el-form-item>
                       <el-form-item>
                         
@@ -207,7 +207,7 @@ export default {
     model: Object
   },
   components:{
-    Editor:require("vue2-ace-editor"),
+    VueEditor: require("vue2-ace-editor"),
     LogView
   },
   data() {

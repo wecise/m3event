@@ -99,9 +99,8 @@
 <script>
 
 import _ from 'lodash';
-import $ from 'jquery';
 import EventList from './EventList.vue';
-import DiagnosisView from './diagnosis/DiagnosisView';
+/*import DiagnosisView from './diagnosis/DiagnosisView';
 import SmartGroupView from './diagnosis/SmartGroupView';
 import EntityView from './diagnosis/EntityView';
 import CtmenuKeepView from './contextmenu/EditView';
@@ -114,7 +113,7 @@ import JobView from './job/JobView';
 import FsView from './api/FsView';
 import PolicyView from './policy/PolicyView';
 import TriggerView from './trigger/TriggerView';
-import PipeView from './pipe/PipeView';
+import PipeView from './pipe/PipeView'; */
 
 export default {
   name: "MainView",
@@ -123,20 +122,20 @@ export default {
   },
   components:{
     EventList,
-    DiagnosisView,
-    CtmenuKeepView,
-    SmartGroupView,
-    EntityView,
-    SeverityView,
-    DashView,
-    NotifyView,
-    RuleView,
-    JobView,
-    FsView,
-    PolicyView,
-    TriggerView,
-    PipeView,
-    CollectorView
+    DiagnosisView: resolve => {require(['./diagnosis/DiagnosisView.vue'], resolve)},
+    CtmenuKeepView: resolve => {require(['./contextmenu/EditView.vue'], resolve)},
+    SmartGroupView: resolve => {require(['./diagnosis/SmartGroupView.vue'], resolve)},
+    EntityView: resolve => {require(['./diagnosis/EntityView.vue'], resolve)},
+    SeverityView: resolve => {require(['./utils/SeverityView.vue'], resolve)},
+    DashView: resolve => {require(['./dashview/DashView.vue'], resolve)},
+    NotifyView: resolve => {require(['./notify/NotifyView.vue'], resolve)},
+    RuleView: resolve => {require(['./rule/RuleView.vue'], resolve)},
+    JobView: resolve => {require(['./job/JobView.vue'], resolve)},
+    FsView: resolve => {require(['./api/FsView.vue'], resolve)},
+    PolicyView: resolve => {require(['./policy/PolicyView.vue'], resolve)},
+    TriggerView: resolve => {require(['./trigger/TriggerView.vue'], resolve)},
+    PipeView: resolve => {require(['./pipe/PipeView.vue'], resolve)},
+    CollectorView: resolve => {require(['./collector/RuleView'], resolve)}
   },
   data() {
     return {
@@ -168,9 +167,9 @@ export default {
     'tabs.list':{
         handler(val){
             if(val.length > 0){
-                $("#tab-event-list").show();
+                document.querySelector("#tab-event-list").style.display = '';
             }else {
-                $("#tab-event-list").hide();
+                document.querySelector("#tab-event-list").style.display = 'none';
             }
         },
         deep:true
@@ -201,9 +200,11 @@ export default {
   },
   methods: {
     hideTabEventViewConsoleUl(){
-      if($('#tab-event-list').is(':visible')) {
-          $("#tab-event-list").hide();
-          $("#tab-event-list > span").hide();
+      let el = document.querySelector("#tab-event-list");
+      let elSpan = document.querySelector("#tab-event-list span");
+      if(el) {
+          el.style.display = 'none';
+          elSpan.style.display = 'none';
       } else {
           setTimeout(this.hideTabEventViewConsoleUl, 50);
       } 

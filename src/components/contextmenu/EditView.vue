@@ -135,14 +135,14 @@
                                 </template>
                                  <template v-if="form.data.type=='action'">
                                     <el-form-item label="动作编辑">
-                                        <editor
+                                        <VueEditor
                                             v-model="form.data.action.name"
                                             @init="onEditorInit"
                                             :lang="editor.lang.value"
                                             :theme="editor.theme.value"
                                             width="100%"
                                             height="30vh"
-                                        ></editor>
+                                        ></VueEditor>
                                     </el-form-item>
                                     <el-form-item label="参数">
                                         <el-input v-model="form.data.action.value"></el-input>
@@ -207,14 +207,14 @@
                     </template>
                     <template v-else-if="dialog.new.data.type === 'action'">
                         <el-form-item label="动作编辑">
-                            <editor
+                            <VueEditor
                                 v-model="dialog.new.data.action.name"
                                 @init="onEditorInit"
                                 :lang="editor.lang.value"
                                 :theme="editor.theme.value"
                                 width="100%"
                                 height="15vh"
-                            ></editor>
+                            ></VueEditor>
                         </el-form-item>
                         <el-form-item label="URL参数">
                             <el-input v-model="dialog.new.data.action.param"></el-input>
@@ -245,7 +245,7 @@ export default {
       global: Object
   },
   components:{
-    editor: require("vue2-ace-editor"),
+    VueEditor: require("vue2-ace-editor"),
     draggable
   },
   data() {
@@ -371,7 +371,7 @@ export default {
         });
 
         this.m3.dfsRead({parent:"/script/matrix/m3event/tools", name:"tools.json"}).then( rtn=>{
-            this.component.list = JSON.parse(rtn.message);
+            this.component.list = rtn.message;
         })
     },
     onDragEnd(){
