@@ -500,10 +500,9 @@ export default {
             // 脚底
             if (scrollTop + windowHeight === scrollHeight) {
                 this.onLoadMore(); 
-                _.delay(()=>{
+                /* _.delay(()=>{
                     evt.target.scrollTop = evt.target.scrollTop - 100;
-                })
-                
+                }) */
             }
             
         })

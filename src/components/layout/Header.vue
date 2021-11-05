@@ -7,7 +7,7 @@
             <span style="font-size:16px;vertical-align: top;">{{auth.Company.title}}</span>
         </el-col>
         <el-col :span="3" style="text-align: right;">
-            <MessageView></MessageView>
+            <!-- <MessageView></MessageView> -->
         </el-col>
         <el-col :span="1" style="text-align: right;">
             
@@ -68,7 +68,7 @@
 <script>
 import _startsWith from 'lodash/startsWith';
 import Cookies from 'js-cookie';
-import MessageView from '../../components/message/MessageView';
+//import MessageView from '../../components/message/MessageView';
 
 export default{
     name: "Header",
@@ -81,7 +81,7 @@ export default{
         }
     },
     components: {
-        MessageView
+        //MessageView
     },
     created(){
         this.initTheme();

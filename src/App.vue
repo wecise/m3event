@@ -1,13 +1,14 @@
 <template>
 
-  <div class="m3 event-console">
-    <Header :auth="auth" class="header" v-if="auth && layout.header.show"></Header>
+  <div class="m3 event-console" v-if="auth && global">
+    <Header :auth="auth" class="header" v-if="layout.header.show"></Header>
     <div :class="layout.header.show ? 'main' : 'main-fullscreen'">
-      <SideBar class="sidebar" :auth="auth" :global="global" v-if="auth && layout.sidebar.show" ></SideBar>
+      <SideBar class="sidebar" :auth="auth" :global="global" v-if="layout.sidebar.show" ></SideBar>
       <MainView :global="global" class="content" v-if="global"></MainView>
     </div>
-    <Footer :auth="auth" class="footer" v-if="auth && layout.footer.show"></Footer>
+    <Footer :auth="auth" class="footer" v-if="layout.footer.show"></Footer>
   </div>
+
 </template>
 
 <script>
@@ -42,12 +43,23 @@ export default {
       }
     }
   },
-  mounted(){
+  created(){
+    let init = ()=>{
+        let timer = setInterval(()=>{
+          try{
+            this.m3.init();
+            this.global = this.m3.global;
+            this.auth = this.m3.auth.signedUser;
+            if(this.m3.auth && this.m3.global){
+              clearTimeout(timer);
+            }
+          }catch(err){
+            console.error(err);
+          }
+        },200);
+    };
     
-    setTimeout(()=>{
-      this.global = this.m3.global;
-      this.auth = this.m3.auth.signedUser;
-    },2000)
+    init();
     
     this.eventHub.$on("layout-change",(data)=>{
       this.layout = data;

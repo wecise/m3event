@@ -11,7 +11,30 @@ function resolve(dir) {
 
 module.exports = {
     devServer: {
-        port: 8080
+        port: 8080,
+        proxy: {
+            "/static": {
+                target: `http://${process.env.VUE_APP_M3_HOST}`,
+            },
+            "/user": {
+                target: `http://${process.env.VUE_APP_M3_HOST}`,
+            },
+            "/matrix": {
+                target: `http://${process.env.VUE_APP_M3_HOST}`,
+            },
+            "/script": {
+                target: `http://${process.env.VUE_APP_M3_HOST}`,
+            },
+            "/web": {
+                target: `http://${process.env.VUE_APP_M3_HOST}`,
+            },
+            "/config": {
+                target: `http://${process.env.VUE_APP_M3_HOST}`,
+            },
+            "/fs": {
+                target: `http://${process.env.VUE_APP_M3_HOST}`,
+            },
+        }
     },
 
     outputDir: 'app/matrix/' + process.env.VUE_APP_M3_APP,
@@ -45,7 +68,7 @@ module.exports = {
 
       chainWebpack(config) {
 
-        config.optimization.splitChunks({
+        /* config.optimization.splitChunks({
             chunks: 'all',
             maxSize: 3000000,
             maxInitialRequests:30,
@@ -69,7 +92,7 @@ module.exports = {
                     reuseExistingChunk: true
                 }
             }
-        })
+        }) */
         
         // ============压缩图片 start============
         config.module
