@@ -1,56 +1,61 @@
 <template>
   
     <el-container>
-        <el-header style="height:auto!important;min-height:60px!important;">
-            <el-dropdown style="position:absolute;top:5px;left:15px;" trigger="click">
-                <span class="el-dropdown-link">
-                    <i class="el-icon-s-grid el-icon--right" style="cursor:pointer;padding-top:10px;font-size:16px;"></i>
+        <el-header style="height:auto!important;min-height:60px!important;background:#f2f2f2;">
+            <div style="display:flex;">
+                <span>
+                    <span style="font-weight:600;">选择属性：</span>
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link">
+                            <i class="el-icon-s-grid el-icon--right" style="cursor:pointer;padding-top:10px;font-size:16px;"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown" style="width:30vw;padding:20px;">
+                            <el-container>
+                                <el-header style="height: 40px;line-height: 40px;padding:0px;" v-if="attr.dt.selected.length > 1">
+                                    <span style="float:right;">
+                                        <el-button type="success" @click="onAttrSelect(';')">选择（OR）</el-button>
+                                        <el-button type="warning" @click="onAttrSelect('|')">选择（AND）</el-button>
+                                    </span>
+                                </el-header>
+                                <el-header style="height: 40px;line-height: 40px;padding:0px;" v-else-if="attr.dt.selected.length == 1">
+                                    <span style="float:right;">
+                                        <el-button type="primary" @click="onAttrSelect(',')">选择同一 {{ attr.dt.selected | pickAttrName }}</el-button>
+                                    </span>
+                                </el-header>
+                                <el-header style="height: 40px;line-height: 40px;padding:0px;" v-else>
+                                    <span>选择属性
+                                    </span>
+                                </el-header>
+                                <el-main style="padding: 10px 0 0 0;">
+                                    <el-table
+                                        ref="attrTable"
+                                        border
+                                        stripe
+                                        :data="attr.dt.rows"
+                                        tooltip-effect="dark"
+                                        style="width: 100%"
+                                        @selection-change="onAttrSelectionChange"
+                                        class="diagnosis-attr-table">
+                                        <el-table-column
+                                            type="selection"
+                                            width="55">
+                                        </el-table-column>
+                                        <el-table-column
+                                            prop="name"
+                                            label="属性"
+                                            width="120">
+                                        </el-table-column>
+                                        <el-table-column
+                                            prop="value"
+                                            label="值">
+                                        </el-table-column>
+                                    </el-table>
+                                </el-main>
+                            </el-container>
+                        </el-dropdown-menu>
+                    </el-dropdown>
                 </span>
-                <el-dropdown-menu slot="dropdown" style="width:30vw;padding:20px;">
-                    <el-container>
-                        <el-header style="height: 40px;line-height: 40px;padding:0px;" v-if="attr.dt.selected.length > 1">
-                            <span style="float:right;">
-                                <el-button type="success" @click="onAttrSelect(';')">选择（OR）</el-button>
-                                <el-button type="warning" @click="onAttrSelect('|')">选择（AND）</el-button>
-                            </span>
-                        </el-header>
-                        <el-header style="height: 40px;line-height: 40px;padding:0px;" v-else-if="attr.dt.selected.length == 1">
-                            <span style="float:right;">
-                                <el-button type="primary" @click="onAttrSelect(',')">选择同一 {{ attr.dt.selected | pickAttrName }}</el-button>
-                            </span>
-                        </el-header>
-                        <el-header style="height: 40px;line-height: 40px;padding:0px;" v-else>
-                            <span>选择属性
-                            </span>
-                        </el-header>
-                        <el-main style="padding: 10px 0 0 0;">
-                            <el-table
-                                ref="attrTable"
-                                border
-                                stripe
-                                :data="attr.dt.rows"
-                                tooltip-effect="dark"
-                                style="width: 100%"
-                                @selection-change="onAttrSelectionChange"
-                                class="diagnosis-attr-table">
-                                <el-table-column
-                                    type="selection"
-                                    width="55">
-                                </el-table-column>
-                                <el-table-column
-                                    prop="name"
-                                    label="属性"
-                                    width="120">
-                                </el-table-column>
-                                <el-table-column
-                                    prop="value"
-                                    label="值">
-                                </el-table-column>
-                            </el-table>
-                        </el-main>
-                    </el-container>
-                </el-dropdown-menu>
-            </el-dropdown>
+            </div>
             <div class="tag-box" v-if="attr.tag.list.length > 0">
                 <el-tag 
                     class="tag-box-item"
@@ -105,7 +110,7 @@ export default {
               columns: [],
               options:{
                   header:false,
-                  dtContainerHeight: '320px',
+                  dtContainerHeight: '260px',
                   severityBar: false
                 }
           }
@@ -197,7 +202,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .el-container{
-    height:calc(100vh - 190px);
+    height: calc(100vh - 190px)!important;
+    background: #f2f2f2;
     border:unset!important;
 }
 
@@ -206,10 +212,13 @@ export default {
 }
 
 .tag-box{
-display: flex;
-flex-wrap: wrap;
-height:100px!important;
-align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    height:auto;
+    align-items: center;
+    overflow: auto;
+    padding:5px 0px;;
+    background: #f2f2f2;
 }
 .tag-box-item{
     margin: 5px;

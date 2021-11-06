@@ -114,6 +114,7 @@
             </el-dialog>
             <el-table
                 :data="dt.rows"
+                border
                 :highlight-current-row="true"
                 :row-class-name="rowClassName"                
                 @row-contextmenu="onRowContextmenu"
