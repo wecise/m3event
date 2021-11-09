@@ -44,22 +44,9 @@ export default {
     }
   },
   created(){
-    let init = ()=>{
-        let timer = setInterval(()=>{
-          try{
-            this.m3.init();
-            this.global = this.m3.global;
-            this.auth = this.m3.auth.signedUser;
-            if(this.m3.auth && this.m3.global){
-              clearTimeout(timer);
-            }
-          }catch(err){
-            console.error(err);
-          }
-        },200);
-    };
     
-    init();
+    this.global = this.m3.global;
+    this.auth = this.m3.auth.signedUser;
     
     this.eventHub.$on("layout-change",(data)=>{
       this.layout = data;

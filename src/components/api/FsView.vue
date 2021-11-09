@@ -197,7 +197,7 @@ export default {
                 // 添加tab
                 this.tabs.activeIndex = id;
                 
-                this.m3.dfsRead(data).then(rtn=>{
+                this.m3.dfs.read(data).then(rtn=>{
                     console.log(11,rtn)
                     this.tabs.list.push({data: data, content: rtn});
                 }).catch(err=>{
@@ -301,9 +301,9 @@ export default {
             let formatted = "";
             
             if(ftype==='html'){
-                formatted = this.m3.htmlFormat(content, 4, ' ', 200);
+                formatted = this.m3.utils.htmlFormat(content, 4, ' ', 200);
             } else if(ftype==='js'){
-                formatted = this.m3.jsFormat(content, 4, ' ', 0);
+                formatted = this.m3.utils.jsFormat(content, 4, ' ', 0);
             } else if(ftype==='json'){
                 formatted = JSON.stringify(JSON.parse(content),null,2);
             } else { 

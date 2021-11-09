@@ -29,7 +29,7 @@ export default({
     },
     methods:{
         init(){
-            this.m3.dfsRead({parent:"/script/matrix/m3event/tools", name:"tools.json"}).then(rtn=>{
+            this.m3.dfs.read({parent:"/script/matrix/m3event/tools", name:"tools.json"}).then(rtn=>{
                 
                 this.list = _.chain(JSON.parse(rtn)).filter(res=>{
                     return res['status']!==false;

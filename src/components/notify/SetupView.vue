@@ -220,14 +220,14 @@ export default {
   methods: {
     initData(){
         let param = {parent: this.root , fullname: this.root, name: 'server.json'};
-        this.m3.dfsRead(param).then( res=>{
+        this.m3.dfs.read(param).then( res=>{
             this.rtype = JSON.parse(res);
         } );
     },
     onNodeClick(node){
       this.dt.columns = [];
       
-      this.m3.dfsRead(node).then(res=>{
+      this.m3.dfs.read(node).then(res=>{
         let rt = JSON.parse(res.message);
         this.dt.rows = rt.rows;
         this.dt.columns = _.map(rt.columns,v=>{

@@ -383,7 +383,7 @@
                         data: {content: content, ftype: ftype, attr: attr, index: index}
                     };
 
-                    this.m3.dfsNew(param).then(()=>{
+                    this.m3.dfs.newFile(param).then(()=>{
                         this.$message({
                             type: "success",
                             message: "新建接入组成功 " + value
@@ -428,7 +428,7 @@
                         data: {content: content, ftype: ftype, attr: attr, index: index}
                     };
 
-                    this.m3.dfsNew(param).then(()=>{
+                    this.m3.dfs.newFile(param).then(()=>{
                         this.$message({
                             type: "success",
                             message: "新建接入成功 " + value

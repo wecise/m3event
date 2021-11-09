@@ -246,8 +246,6 @@ export default {
     },
     onSearch() {
       
-      const rLoading = this.openLoading('event-console-el-main');
-
       let param = {
         view: this.search.model.view=this.views.value,
         term: this.search.model.term
@@ -260,10 +258,8 @@ export default {
         encodeURIComponent(JSON.stringify(param))
       ).then( (rtn)=>{
           this.search.result.list = rtn.message;
-          rLoading.close();
       }).catch( err=>{
         this.search.result.list = null;
-        rLoading.close();
         console.error(err);
       } );
 

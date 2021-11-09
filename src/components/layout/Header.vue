@@ -87,7 +87,7 @@ export default{
         this.initTheme();
     },
     mounted(){
-        this.m3.setTitle(this.auth);
+        this.m3.html.setTitle(this.auth);
     },
     methods: {
         onSelect(key) {

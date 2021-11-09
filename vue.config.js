@@ -12,6 +12,9 @@ function resolve(dir) {
 module.exports = {
     devServer: {
         port: 8080,
+        contentBase: [
+            path.join(__dirname, "public"), //追加本文件所在目录下的public目录
+        ],
         proxy: {
             "/static": {
                 target: `http://${process.env.VUE_APP_M3_HOST}`,
@@ -34,6 +37,15 @@ module.exports = {
             "/fs": {
                 target: `http://${process.env.VUE_APP_M3_HOST}`,
             },
+            "/matrix/files": {
+                target: `http://${process.env.VUE_APP_M3_HOST}//matrix/files`,
+            },
+            "/matrix/system": {
+                target: `http://${process.env.VUE_APP_M3_HOST}//matrix/system`,
+            },
+            "/help":{
+                target: `http://${process.env.VUE_APP_M3_HOST}/help`
+            }
         }
     },
 

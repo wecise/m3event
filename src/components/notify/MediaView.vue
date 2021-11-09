@@ -121,7 +121,7 @@ export default {
   methods: {
     initData(){
 
-      this.m3.dfsRead({parent: this.config.root, name: this.config.name}).then( rtn=>{
+      this.m3.dfs.read({parent: this.config.root, name: this.config.name}).then( rtn=>{
           this.config.content = JSON.parse(rtn);
       })
 

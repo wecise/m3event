@@ -376,7 +376,7 @@ export default {
                     message: h('span', null, [
                         h('p', null, `文件名称：${file.name}`),
                         h('p', null, `修改时间：${file.lastModifiedDate}`),
-                        h('p', null, `文件大小：${this.m3.bytesToSize(file.size)}`)
+                        h('p', null, `文件大小：${this.m3.utils.bytesToSize(file.size)}`)
                     ]),
                     showCancelButton: true,
                     confirmButtonText: '确定',

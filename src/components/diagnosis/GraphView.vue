@@ -236,7 +236,7 @@ export default {
             return false;
         } else {
             
-            this.m3.dfsRead({parent:"/script/matrix/m3event/graph", name:"config.json"}).then( rtn=>{
+            this.m3.dfs.read({parent:"/script/matrix/m3event/graph", name:"config.json"}).then( rtn=>{
                 let matchTemplate = _.template(JSON.parse(rtn).match);
                 let match = matchTemplate({ids: this.model.join("','")});
                 let param = encodeURIComponent( match );

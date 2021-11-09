@@ -2,7 +2,7 @@
     <el-container :style="dtContainerHeight" class="event-console">
         <el-header v-if="dtOptions.header">
             
-            <el-tooltip :content="$t('event.actions.refresh')"  placement="top">
+            <el-tooltip content="刷新"  placement="top">
                 <el-button type="text" @click="onReloadAndRefresh">
                     <span class="el-icon-refresh" style="cursor:pointer;font-size:16px;"></span>
                 </el-button>
@@ -733,7 +733,7 @@ export default {
                                 name: this.dialog.attachment.data.id,
                                 data:{content:null,ftype:'dir',attr:""}
                 };
-                this.m3.dfsNew(param);
+                this.m3.dfs.newFile(param);
             }catch(err){
                 console.error(err);
             }
@@ -861,7 +861,7 @@ export default {
                 this.notify.sound.stop();
             }
 
-            this.m3.dfsRead({parent:"/script/matrix/m3event/notify", name:"config.json"}).then( rtn=>{
+            this.m3.dfs.read({parent:"/script/matrix/m3event/notify", name:"config.json"}).then( rtn=>{
                 let src = '/static'+JSON.parse(rtn).voice;
                 this.notify.sound = new Howl({
                     src: [src],

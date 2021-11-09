@@ -370,7 +370,7 @@ export default {
             this.tree.list = rtn.message;
         });
 
-        this.m3.dfsRead({parent:"/script/matrix/m3event/tools", name:"tools.json"}).then( rtn=>{
+        this.m3.dfs.read({parent:"/script/matrix/m3event/tools", name:"tools.json"}).then( rtn=>{
             this.component.list = rtn.message;
         })
     },

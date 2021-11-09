@@ -191,7 +191,7 @@ export default {
                                 parent:parent, name: value,
                                 data:{content:null,ftype:'dir',attr:{remark: '', rate: 0}}
                 };
-                this.m3.dfsNew(param).then( (res)=>{
+                this.m3.dfs.newFile(param).then( (res)=>{
                     this.$message({
                         type: "success",
                         message: "新建目录成功 " + res
@@ -239,7 +239,7 @@ export default {
                             parent:parent, name: [item.name,item.ftype].join("."),
                             data:{content:'',ftype: item.ftype, attr:{remark: '', rate: 0}}
             };
-            this.m3.dfsNew(param).then( (res)=>{
+            this.m3.dfs.newFile(param).then( (res)=>{
                 this.$message({
                     type: "success",
                     message: "新建成功 " + res
@@ -424,7 +424,7 @@ export default {
                     message: h('span', null, [
                         h('p', null, `文件名称：${file.name}`),
                         h('p', null, `修改时间：${file.lastModifiedDate}`),
-                        h('p', null, `文件大小：${this.m3.bytesToSize(file.size)}`)
+                        h('p', null, `文件大小：${this.m3.utils.bytesToSize(file.size)}`)
                     ]),
                     showCancelButton: true,
                     confirmButtonText: '确定',

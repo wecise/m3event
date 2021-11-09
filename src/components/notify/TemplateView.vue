@@ -279,7 +279,7 @@ export default {
                     parent: this.dialog.template.data.parent, name: [this.dialog.template.data.name,this.dialog.template.data.ftype].join(".").replace(/.json.json/,'.json'), 
                     data: {content: this.dialog.template.data.content, type: this.dialog.template.data.ftype, attr: this.dialog.template.data.attr, index: true}    
                   };
-      this.m3.dfsNew(param).then(()=>{
+      this.m3.dfs.newFile(param).then(()=>{
           this.$message({
             type: "success",
             message: "新建模板成功！"
