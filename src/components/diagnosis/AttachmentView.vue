@@ -99,7 +99,7 @@ export default {
   methods: {
     initData(){
         let param = {parent: [this.baseUrl,this.model.entity,this.model.id].join("/"), fullname: [this.baseUrl,this.model.entity,this.model.id].join("/")};
-        this.m3.dfsList(param).then((res)=>{
+        this.m3.dfs.list(param).then((res)=>{
             this.dt.rows = res.message;
         })
     },

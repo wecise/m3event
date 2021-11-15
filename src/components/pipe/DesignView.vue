@@ -364,7 +364,7 @@
                             },
                             theme: {
                                 value: "monokai",
-                                list: this.m3.EDITOR_THEME
+                                list: this.m3.theme.EDITOR_THEME
                             }
                         },
                         tomlEditor: {
@@ -376,7 +376,7 @@
                             },
                             theme: {
                                 value: "monokai",
-                                list: this.m3.EDITOR_THEME
+                                list: this.m3.theme.EDITOR_THEME
                             }
                         }
                     },
@@ -392,7 +392,7 @@
                             },
                             theme: {
                                 value: "monokai",
-                                list: this.m3.EDITOR_THEME
+                                list: this.m3.theme.EDITOR_THEME
                             }
                         }
                     },
@@ -408,7 +408,7 @@
                             },
                             theme: {
                                 value: "monokai",
-                                list: this.m3.EDITOR_THEME
+                                list: this.m3.theme.EDITOR_THEME
                             }
                         }
                     }
@@ -856,7 +856,7 @@
                                 }
                                 // rule
                                 else if(state.cell.value.type === 'rule'){
-                                    this.m3.ruleGet(state.cell.value.name).then(rtn=>{
+                                    this.m3.rule.get(state.cell.value.name).then(rtn=>{
                                         this.dialog.rule.data = rtn.message;
                                         this.dialog.rule.show = true;
                                     })
@@ -1453,7 +1453,7 @@
                             type: 'warning'
                     }).then(() => {
 
-                        this.m3.ruleUpdate(data).then( ()=>{
+                        this.m3.rule.update(data).then( ()=>{
                             
                             this.$message({
                                 type: "success",

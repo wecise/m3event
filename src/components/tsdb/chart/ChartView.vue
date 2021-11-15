@@ -96,7 +96,9 @@ export default {
     methods: {
         initData(){
             try{
-
+                this.options.xAxis.data=[];
+                this.options.series = [];
+                
                 let param = encodeURIComponent( JSON.stringify(this.model) );
                 this.m3.callFS("/matrix/m3event/diagnosis/tsdb/searchPerformanceByTerm.js",param).then( val=>{
                     let rtn = val.message.result.reverse();
@@ -126,12 +128,14 @@ export default {
                     }];
                 } );
                 
+                
+                
             } catch(err){
                 console.error(err);
             }
         },
         destroyed(){
-            $(this.$el).off();
+            this.$el.remove();
         }
     }
 };

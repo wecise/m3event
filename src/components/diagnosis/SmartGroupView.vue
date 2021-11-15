@@ -8,7 +8,7 @@
                         <span style="font-weight:600;color:#555;">
                             <span class="el-icon-s-grid"></span> 分组列表
                         </span>
-                        <el-tooltip :content="$t('event.actions.refresh')"  placement="top">
+                        <el-tooltip content="刷新"  placement="top">
                             <el-button type="text" @click="onRefresh" style="float:right;">
                                 <span class="el-icon-refresh" style="cursor:pointer;"></span>
                             </el-button>
@@ -161,7 +161,7 @@ export default {
         this.initData();
     },
     initData(){
-        const rLoading = this.openLoading('smartGroup-list');
+        
         this.smartGroup.dt.rows = [];
         this.graph.model = [];
         this.dt.rows = [];
@@ -184,8 +184,6 @@ export default {
             })});
             
             _.extend(this.smartGroup.dt, { rows: rt.rows });
-
-            rLoading.close();
 
         })
     },

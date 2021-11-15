@@ -152,7 +152,7 @@ export default {
     methods: {
         initData(){
             let param = {parent: this.root, fullname: this.root };
-            this.m3.dfsList(param).then( (rtn)=>{
+            this.m3.dfs.list(param).then( (rtn)=>{
                 this.treeData = [{ id:-1,fullname: this.root, parent: this.root, name:'我的接口',children: _.sortBy(rtn.message, ['fullname'],['asc']), ftype:'dir'}];
             } );
         },
@@ -164,7 +164,7 @@ export default {
             this.$set(item, 'show', false)
         },
         onRefresh(item){
-            this.m3.dfsList(item).then( (rtn)=>{
+            this.m3.dfs.list(item).then( (rtn)=>{
                 this.$set(item, 'children', _.sortBy(rtn.message, ['fullname'],['asc']));
             } );
         },
@@ -271,7 +271,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 let param = {parent:item.parent, name:item.name};
-                this.m3.dfsDelete(param).then( res=>{
+                this.m3.dfs.deleteFile(param).then( res=>{
                     this.$message({
                             type: "success",
                             message: "删除成功 " + res
@@ -372,7 +372,7 @@ export default {
 
                 if(data.isdir) {
                     let param = {parent: data.fullname, fullname: data.fullname };
-                    this.m3.dfsList(param).then( (rtn)=>{
+                    this.m3.dfs.list(param).then( (rtn)=>{
                         let children = _.sortBy(rtn.message,'fullname');
                         this.$set(data, 'children', children);
                     } )
@@ -401,7 +401,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 
-                this.m3.dfsExport(key).then(res=>{
+                this.m3.dfs.zip(key).then(res=>{
                     this.$message.success("接口导出成功 " + res);
                 }).catch(err=>{
                     this.$message.error("接口导出失败 " + err);
@@ -433,7 +433,7 @@ export default {
                     type: 'warning'
             }).then(() => {
 
-                this.m3.dfsImport(file).then(res=>{
+                this.m3.dfs.unzip(file).then(res=>{
                     this.$message({
                         type: "success",
                         message: "导入成功 " + res.name

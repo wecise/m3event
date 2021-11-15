@@ -182,7 +182,7 @@ export default {
           },
           theme: {
               value: "merbivore",
-              list: this.m3.EDITOR_THEME
+              list: this.m3.theme.EDITOR_THEME
           }
       }
     };
@@ -303,7 +303,7 @@ export default {
           
           let param = {parent: item.parent, name: item.name};
 
-          this.m3.dfsDelete(param).then(()=>{
+          this.m3.dfs.deleteFile(param).then(()=>{
             this.$message({
                     type: 'success',
                     message: '删除模板成功!'

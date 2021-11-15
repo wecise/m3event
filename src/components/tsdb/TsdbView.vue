@@ -9,6 +9,13 @@
             ref="bucketKeys"></EntityCascaderView>
             
         <div style="background:#f2f2f2;margin-top:-20px;padding:0 20px;">
+            <div style="position:absolute;top:40px;right:40px;" v-if="kpi.list.length>0">
+                <el-switch v-model="control.refresh.flag" 
+                    active-text="自动刷行" inactive-text="停止刷行" 
+                    active-color="#4caf50"
+                    :active-value="true"
+                    :inactive-value="false"></el-switch>
+            </div>
             <h4>已选指标：
                 <el-tag
                     :key="index" v-for="(tag,index) in selectedBuckets"
@@ -274,7 +281,14 @@ export default{
                     data: null
                 }
             },
-            selectedBuckets:null
+            selectedBuckets:null,
+            control:{
+                refresh: {
+                    flag: false,
+                    inst:null,
+                    interval: 5000
+                }
+            }
         }
     },
     filters:{
@@ -284,11 +298,42 @@ export default{
     },
     watch: {
         'kpi.time'(val){
-            _.forEach(this.kpi.list,(v)=>{
+
+            this.kpi.list.forEach(v=>{
                 this.$set(v,'time',val);
             })
             
             Cookies.set('m3performance-time',val);
+        },
+        'control.refresh.flag':{
+            handler(val){
+                if(val) {
+                    this.control.refresh.inst = setInterval(()=>{
+                        this.kpi.list.forEach(v=>{
+                            this.$refs['chart'+v.i][0].initData();
+                        })
+                    },this.control.refresh.interval);
+                    this.$message({
+                        type: "success",
+                        message: "自动刷新开启"
+                    })
+                } else {
+                    clearInterval(this.control.refresh.inst);
+                    this.$message({
+                        type: "info",
+                        message: "自动刷新关闭"
+                    })
+                }
+            },
+            immediate:true
+        },
+        'kpi.list':{
+            handler(val){
+                if(val.length<1){
+                    this.control.refresh.flag = false;
+                }
+            },
+            immediate:false
         }
     },
     created(){
@@ -343,7 +388,7 @@ export default{
             
         },
         onFullScreen(val){
-            // this.m3.fullScreenByEl(this.$refs['item'+val][0].$el);
+            // this.m3.html.fullScreenByEl(this.$refs['item'+val][0].$el);
 
             this.dialog.max.show = true;
             this.dialog.max.data = val;

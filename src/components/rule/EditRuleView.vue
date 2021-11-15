@@ -60,7 +60,7 @@ export default {
                 },
                 theme: {
                     value: "chrome",
-                    list: this.m3.EDITOR_THEME
+                    list: this.m3.theme.EDITOR_THEME
                 },
                 height:'calc(100vh - 225px)'
             },

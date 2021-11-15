@@ -68,7 +68,7 @@ import {
     Notification
   } from 'element-ui';
 
-// Vue.use(Pagination);
+  // Vue.use(Pagination);
 Vue.use(Dialog);
 Vue.use(Autocomplete);
 Vue.use(Badge);
@@ -152,4 +152,3 @@ Vue.prototype.$confirm = MessageBox.confirm;
 Vue.prototype.$prompt = MessageBox.prompt;
 Vue.prototype.$notify = Notification;
 Vue.prototype.$message = Message;
-//Vue.use(Element,{size: 'mini'})

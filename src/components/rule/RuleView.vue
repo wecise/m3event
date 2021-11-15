@@ -143,7 +143,7 @@ export default {
             editor: {
                 theme: {
                     value: "merbivore",
-                    list: this.m3.EDITOR_THEME
+                    list: this.m3.theme.EDITOR_THEME
                 }
             },
             configTreeSelectedNode:{}
@@ -239,7 +239,7 @@ export default {
                     type: 'warning'
             }).then(() => {
 
-                let rtn = this.m3.ruleImport(file,null);
+                let rtn = this.m3.rule.import(file,null);
 
                 if(rtn == 1){
                     this.eventHub.$emit("CONFIG-TREE-REFRESH-EVENT", '/');
@@ -258,7 +258,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 
-                this.m3.ruleExport(this.configTreeSelectedNode.key,this);
+                this.m3.rule.export(this.configTreeSelectedNode.key,this);
                 
             }).catch(() => {
                 
@@ -369,7 +369,7 @@ export default {
                     type: 'warning'
             }).then(() => {
 
-                this.m3.ruleAdd(this.dialog.configNew.formItem).then( (rtn)=>{
+                this.m3.rule.add(this.dialog.configNew.formItem).then( (rtn)=>{
                     if(rtn == 1){
                         this.$message({
                             type: "success",
@@ -417,7 +417,7 @@ export default {
                     type: 'warning'
             }).then(() => {
 
-                this.m3.ruleAdd(item).then( ()=>{
+                this.m3.rule.add(item).then( ()=>{
                     
                     this.$message({
                         type: "success",
@@ -460,7 +460,7 @@ export default {
                     type: 'warning'
             }).then(() => {
 
-                this.m3.ruleDelete(item).then( (rtn)=>{
+                this.m3.rule.rmove(item).then( (rtn)=>{
                     if(rtn == 1){
                         // 刷新Tree
                         this.eventHub.$emit("CONFIG-TREE-REFRESH-EVENT",item.key);

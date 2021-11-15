@@ -228,7 +228,7 @@ export default {
           },
           theme: {
               value: "chrome",
-              list: this.m3.EDITOR_THEME
+              list: this.m3.theme.EDITOR_THEME
           }
       },
       dialog: {
@@ -282,7 +282,7 @@ export default {
         });
     },
     initData(){
-        this.m3.triggerList(this.view.value).then(rtn=>{
+        this.m3.trigger.list(this.view.value).then(rtn=>{
             this.dt.rows = [];
             let parse = this.parseTrigger(rtn.message[0]);
             this.dt.rows = _.map(parse,v=>{
@@ -301,7 +301,7 @@ export default {
     },
     onChangeStatus(item){
       let param = {class: this.view.value, name: item.name, script: item.script, attr:{ disable: item.disable, before: item.before, level: String(item.level)}};
-      this.m3.triggerNew(param).then(()=>{
+      this.m3.trigger.newTrigger(param).then(()=>{
           this.onRefresh();
       } );
     },
@@ -338,7 +338,7 @@ export default {
           before: this.dialog.newTrigger.data.before,
           level: String(this.dialog.newTrigger.data.level)
           }};
-      this.m3.triggerNew(param).then(()=>{
+      this.m3.trigger.newTrigger(param).then(()=>{
           this.onRefresh();
           // this.dialog.newTrigger.show = false;
       } ).catch(err=>{
@@ -358,7 +358,7 @@ export default {
         type: 'warning'
       }).then(() => {
        
-        this.m3.triggerDelete(this.dialog.newTrigger.data.class,item.name).then(()=>{
+        this.m3.trigger.deleteTrigger(this.dialog.newTrigger.data.class,item.name).then(()=>{
           this.$message({
             type: "success",
             message: "删除成功"

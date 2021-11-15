@@ -156,7 +156,7 @@ export default {
             editor: {
                 theme: {
                     value: "merbivore",
-                    list: this.m3.EDITOR_THEME
+                    list: this.m3.theme.EDITOR_THEME
                 }
             }
         }
@@ -236,7 +236,7 @@ export default {
 
         },
         onToggleFullScreen(){
-            this.m3.fullScreen(true);
+            this.m3.html.fullScreen(true);
         },
         onEditorChange(content){
             let fs = this.currentTab;
@@ -262,7 +262,7 @@ export default {
             };
 
             // save
-            this.m3.dfsWrite(param).then( ()=>{
+            this.m3.dfs.write(param).then( ()=>{
 
                 // this.$refs.editor.session.getUndoManager().markClean();
 
@@ -283,7 +283,7 @@ export default {
 
             let term = encodeURIComponent();
             let param = {fullname:fs.fullname, term: term };
-            this.m3.dfsExec(param).then(res=>{
+            this.m3.dfs.exec(param).then(res=>{
                 this.tip.loading = false;
                 this.tip.message = "";
                 _.extend(fs, {output:res});

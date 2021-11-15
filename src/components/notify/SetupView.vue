@@ -255,7 +255,7 @@ export default {
                       data: { content: content, type: 'json', attr: '', index: true }    
                   };
       
-      this.m3.dfsWrite(param).then(()=>{
+      this.m3.dfs.write(param).then(()=>{
           
           
           let data = _.filter(this.rtype,v=>{ return v.status; });

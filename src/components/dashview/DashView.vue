@@ -149,10 +149,10 @@ export default {
         })
 
         
-      }).catch(() => {
+      }).catch(err => {
         this.$message({
           type: 'info',
-          message: '取消新建视图操作'
+          message: '取消新建视图操作 ' + err
         });       
       });
       
@@ -172,10 +172,10 @@ export default {
       this.$confirm(`确定要删除该视图 ${item.name}, 是否继续?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning'
+        type: 'error'
       }).then(() => {
        
-        this.m3.dfsDelete(item).then(()=>{
+        this.m3.dfs.deleteFile(item).then(()=>{
           this.$message({
             type: "success",
             message: "删除成功"
@@ -190,10 +190,10 @@ export default {
             this.onRefresh();
           },1000)
         });
-      }).catch(() => {
+      }).catch(err => {
         this.$message({
           type: 'info',
-          message: '已取消删除'
+          message: '已取消删除 ' + err
         });          
       })
     },

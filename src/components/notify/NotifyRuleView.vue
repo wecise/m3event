@@ -277,7 +277,7 @@ export default {
       })
     },
     init(){
-      this.m3.userList().then(rtn=>{
+      this.m3.user.list().then(rtn=>{
         this.persons.list = [rtn.message];
       })
 

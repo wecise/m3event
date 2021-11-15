@@ -897,7 +897,7 @@ export default {
             // 模式逻辑切换
             // 全屏模式
             if(this.control.mode.value.name === 'f'){
-                this.m3.fullScreen(true);
+                this.m3.html.fullScreen(true);
 
                 this.eventHub.$emit("layout-change",{
                     header:{ show: true},
@@ -907,11 +907,11 @@ export default {
             } 
             // 监控模式
             else if(this.control.mode.value.name === 'm'){
-                this.m3.fullScreen(true);
+                this.m3.html.fullScreen(true);
             }
             // 运维模式
             else {
-                this.m3.fullScreen(false);
+                this.m3.html.fullScreen(false);
 
                 this.eventHub.$emit("layout-change",{
                     header:{ show: true},

@@ -177,7 +177,7 @@ export default {
       }).then(() => {
                         
         let param = {parent:item.parent, name: item.name};
-        this.m3.dfsDelete(param).then(()=>{
+        this.m3.dfs.deleteFile(param).then(()=>{
             this.$message({
                 type: 'success',
                 message: '删除声音文件成功!'
@@ -204,7 +204,7 @@ export default {
                     data: { content: content, type: this.config.type, attr: "", index: true }    
                   };
       
-      this.m3.dfsWrite(param).then(()=>{
+      this.m3.dfs.write(param).then(()=>{
           this.$message({
             type: "success",
             message: "设置成功"

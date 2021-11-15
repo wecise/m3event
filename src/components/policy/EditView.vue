@@ -313,7 +313,7 @@ export default {
             },
             theme: {
                 value: "chrome",
-                list: this.m3.EDITOR_THEME
+                list: this.m3.theme.EDITOR_THEME
             },
             options:{
                 tabSize: 4,     
@@ -441,7 +441,7 @@ export default {
             return false;
         }
 
-        this.m3.dfsRename(param).then(()=>{
+        this.m3.dfs.rename(param).then(()=>{
             this.policy.loading = false;
             this.$message({
                 type: 'success',
@@ -471,7 +471,7 @@ export default {
             attr: JSON.stringify(this.policy.data.attr)
         };
 
-        this.m3.dfsUpdateAttr(attr).then(()=>{
+        this.m3.dfs.updateAttr(attr).then(()=>{
             
             this.$message({
                 type: 'success',
@@ -511,7 +511,7 @@ export default {
                       data: { content: content, type: this.model.ftype, attr: this.model.attr, index: true }    
                     };
         
-        this.m3.dfsWrite(param).then(()=>{
+        this.m3.dfs.write(param).then(()=>{
             this.$message({
               type: "success",
               message: "更新策略成功"

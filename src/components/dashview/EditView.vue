@@ -51,7 +51,7 @@
                             <VueEditor
                                 v-model="view.model.datasource.filter"
                                 @init="onEditorInit"
-                                :lang="text"
+                                lang="text"
                                 :theme="editor.theme.value"
                                 width="100%"
                                 height="20vh"
@@ -141,7 +141,7 @@ export default {
             },
             theme: {
                 value: "chrome",
-                list: this.m3.EDITOR_THEME
+                list: this.m3.theme.EDITOR_THEME
             }
         },
         datasource:{
@@ -254,7 +254,7 @@ export default {
             return false;
         }
 
-        this.m3.dfsRename(param).then(()=>{
+        this.m3.dfs.rename(param).then(()=>{
             this.view.loading = false;
             this.$message({
                 type: 'success',
@@ -285,7 +285,7 @@ export default {
             attr: JSON.stringify(this.view.model.info.attr)
         };
 
-        this.m3.dfsUpdateAttr(attr).then(()=>{
+        this.m3.dfs.updateAttr(attr).then(()=>{
             
             this.$message({
                 type: 'success',
@@ -388,7 +388,7 @@ export default {
                       data: { content: content, type: this.model.ftype, attr: this.view.model.info.attr, index: true }    
                     };
         
-        this.m3.dfsWrite(param).then(()=>{
+        this.m3.dfs.write(param).then(()=>{
             this.$message({
               type: "success",
               message: "更新数据源成功"
@@ -410,7 +410,7 @@ export default {
         type: 'warning'
       }).then(() => {
        
-        this.m3.dfsDelete(item).then(()=>{
+        this.m3.dfs.deleteFile(item).then(()=>{
           this.$message({
             type: "success",
             message: "删除成功"

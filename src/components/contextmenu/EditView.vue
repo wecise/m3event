@@ -269,7 +269,7 @@ export default {
             },
             theme: {
                 value: "chrome",
-                list: this.m3.EDITOR_THEME
+                list: this.m3.theme.EDITOR_THEME
             }
         },
         component:{
@@ -298,7 +298,7 @@ export default {
       },
       'dialog.new.type':{
           handler(val){
-              this.dialog.new.data = this.m3.EventViewTools[val];
+              this.dialog.new.data = this.m3.event.EventViewTools[val];
           },
           immediate:true
       }
@@ -328,7 +328,7 @@ export default {
     onNew(){
         this.dialog.new.show = true;
         this.dialog.new.data = null;
-        this.dialog.new.data = this.m3.EventViewTools[this.dialog.new.type];
+        this.dialog.new.data = this.m3.event.EventViewTools[this.dialog.new.type];
     },
     onSave(val){
         
@@ -388,7 +388,7 @@ export default {
                         data: { content: content, type: 'json', attr: '', index: true }    
                     };
         
-        this.m3.dfsWrite(param).then(()=>{
+        this.m3.dfs.write(param).then(()=>{
             this.$message({
               type: "success",
               message: "更新成功"

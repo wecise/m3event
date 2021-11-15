@@ -188,7 +188,7 @@ export default {
         type: 'warning'
       }).then(() => {
        
-        this.m3.dfsDelete(item).then(()=>{
+        this.m3.dfs.deleteFile(item).then(()=>{
           this.$message({
             type: "success",
             message: "删除成功"
