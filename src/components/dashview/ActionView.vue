@@ -63,7 +63,9 @@ export default {
         initData(){
             this.m3.callFS("/matrix/entity/entity_class.js",encodeURIComponent(this.root)).then( (rtn)=>{
                 this.treeData = rtn.message;
-                this.$emit("treedata-loaded",this.treeData);
+                setTimeout(()=>{
+                    this.$emit("treedata-loaded",this.treeData);
+                },1500)
             } );
         },
         onFilterNode:_.debounce((value)=>{

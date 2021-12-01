@@ -1,6 +1,6 @@
 <template>  
 
-    <el-tabs value="info" v-if="view.model" type="border-card">
+    <el-tabs value="info" v-if="view.model" type="border-card" @tab-click="onTabClick">
         <el-tab-pane name="info" v-if="view.model.info">
             <h3 slot="label">
                 1、基本信息<small> 设置视图名称和描述信息</small>
@@ -38,7 +38,8 @@
                                     <el-dropdown-menu slot="dropdown">
                                         <ActionView :root="datasource.root" 
                                             @node-click="onDataSourceSelect"
-                                            @treedata-loaded="initDataSourceFields"></ActionView>
+                                            @treedata-loaded="initDataSourceFields"
+                                            ref="dataSourceTree"></ActionView>
                                     </el-dropdown-menu>
                                 </el-dropdown>
                             </el-input>
@@ -190,8 +191,14 @@ export default {
              _.extend(this.view.model.info, {attr:  {remark: "", icon: ""} });   
         }
     },
+    onTabClick(tab){
+        if(tab.name === 'props'){
+            let treeData = this.$refs.dataSourceTree.treeData;
+            this.initDataSourceFields(treeData);
+        }
+    },
     initDataSourceFields(treeData){
-
+        
         if(!this.view.model) return false;
 
         try{
@@ -199,13 +206,14 @@ export default {
             let find = (nodes)=>{
                 
                 _.forEach(nodes,(v)=>{
-                    
+                
                     if(this.view.model.datasource.class == v.class){
                         if(v.fields){
                             this.datasource.fields = _.compact(_.map(v.fields,(val)=>{
+                                
                                 if(_.includes(val,'_')) return;  
 
-                                return {field: val, title: val, ftype: 'varchar', width:120, visible:true};//{key:val, label:val};
+                                return {field: val, title: val, ftype: 'varchar', width:120, visible:true};
                                 
                             }));
                         }
