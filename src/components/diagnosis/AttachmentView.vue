@@ -1,16 +1,20 @@
 <template>
-    <el-container>
-      <el-header>
+    <el-container style="height: calc(100vh - 205px)">
+      <el-header style="height: 40px!important;line-height: 40px;">
           <el-tooltip content="刷新" placement="top">
-              <el-button type="text" @click="onRefresh" icon="el-icon-refresh">
+              <el-button type="text" @click="onRefresh" icon="el-icon-refresh" >
               </el-button>
           </el-tooltip>
           <el-tooltip content="时间轴视图" placement="top">
-              <el-button type="text" @click="currentView='timeline-view'" icon="el-icon-picture">
+              <el-button type="text" @click="currentView='timeline-view'" icon="el-icon-picture" >
               </el-button>
           </el-tooltip>
           <el-tooltip content="列表视图" placement="top">
-              <el-button type="text" @click="currentView='grid-view'" icon="el-icon-s-grid">
+              <el-button type="text" @click="currentView='grid-view'" icon="el-icon-s-grid" >
+              </el-button>
+          </el-tooltip>
+          <el-tooltip content="上传文档" placement="top">
+              <el-button type="text" @click="onUpload" icon="el-icon-upload"  style="color:#29d70b;">
               </el-button>
           </el-tooltip>
       </el-header>
@@ -51,11 +55,50 @@
               </el-button>
           </el-checkbox-group>
       </el-main>
+      <!-- 上传 -->
+      <el-dialog title="上传" 
+          :visible.sync="dialog.upload.show" 
+          :append-to-body="true"
+          :modal-append-to-body="false"
+          :destroy-on-close="true"
+          :close-on-click-modal="false"
+          :close-on-press-escape="false"
+          width="50%!imortant"
+          center
+          v-if="dialog.upload.show">
+          <el-container style="border:unset!important;background:#f2f2f2;">
+              <el-header v-if="model">
+                  实体: {{model.entity}} 事件: {{model.id}}
+              </el-header>
+              <el-main style="text-align: center;">
+                  <el-upload drag
+                      multiple
+                      :action="dialog.upload.url"
+                      :data="dialog.upload.ifIndex"
+                      :on-success="onUploadSuccess"
+                      :on-error="onUploadError"
+                      :on-remove="onUploadRemove"
+                      :list-type="text"
+                      :show-file-list="true"
+                      name="uploadfile">
+                      <i class="el-icon-upload"></i>
+                      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                      <div class="el-upload__tip" slot="tip">单个不超过500MB</div>
+                  </el-upload>
+              </el-main>
+              <el-footer>
+                  <i class="el-icon-s-data"></i> 上传文件：{{dialog.upload.fileList.length}}
+              </el-footer>
+          </el-container>
+          <span slot="footer" class="dialog-footer">
+              <el-button @click="dialog.upload.show = false">取 消</el-button>
+          </span>
+      </el-dialog>
     </el-container>
 </template>
 
 <script>
-//import _ from 'lodash';
+import _ from 'lodash';
 
 export default {
   name: "AttachmentView",
@@ -70,12 +113,21 @@ export default {
           rows: [],
           selected: []
       },
-      reverse: true
+      reverse: true,
+      dialog: {
+          upload: {
+              show: false,
+              url: '/fs/script/matrix/m3event/attachment?issys=true',
+              ifIndex: {index:true},
+              data: null,
+              fileList: []
+          } 
+      }
     };
   },
   filters: {
       pickIcon(item){
-          return `/static/assets/images/files/png/${item.ftype}.png`;
+          return `${window.assetsURLBase}/images/files/png/${item.ftype}.png`;
       },
       formatType(val){
         return val==='dir'?'el-icon-folder-opened':'el-icon-document';
@@ -84,7 +136,7 @@ export default {
         return val==='dir'?'#ff9800':'#4caf50';
       },
       formatSize(val){
-          return window.m3.bytesToSize(val);
+          return window.m3.utils.bytesSize(val);
       },
       pickStatus(val){
           return window.global.register.event.status[val][1];
@@ -108,6 +160,59 @@ export default {
     },
     onAttachOpen(item){
       window.open(`/static${item.fullname}`,'_blank');
+    },
+    onUpload(){
+        this.dialog.upload.url = [['','fs'+this.baseUrl,this.model.entity].join("/"),this.model.id].join("/")+'?issys=true';
+        this.onAttchNewDir();
+        this.dialog.upload.show = true;
+    },
+    onAttchNewDir(){
+        try{
+            let param = {
+                            parent: [this.baseUrl,this.model.entity].join("/"), 
+                            name: this.model.id,
+                            data:{content:null,ftype:'dir',attr:""}
+            };
+            this.m3.dfs.newFile(param);
+        }catch(err){
+            console.error(err);
+        }
+    },
+    onUploadSuccess(res,file,FileList){
+        this.dialog.upload.fileList = FileList;
+        
+        _.forEach(FileList,(v)=>{
+            let attr = {remark: '', rate: '0'};
+            this.m3.dfs.updateAttr({parent:v.parent, name:v.name, attr: attr });
+        })
+
+        // 刷新
+        this.onRefresh();
+
+        this.$message({
+            type: "success",
+            dangerouslyUseHTMLString: true,
+            message: `上传成功！`
+        })
+
+        this.dialog.upload.show = false;
+
+    },
+    onUploadError(){
+        this.$message({
+            type: "error",
+            dangerouslyUseHTMLString: true,
+            message: `上传失败，请确认！`
+        })
+    },
+    onUploadRemove(file) {
+        
+        this.m3.dfs.deleteFile({parent:this.model.parent, name:file.name}).then(()=>{
+            this.onRefresh();
+        }).catch(err=>{
+          console.error(err);
+        });
+        
     }
   }
 };
@@ -115,15 +220,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .el-container{
-    height: calc(100vh - 190px);
-  }
-  .el-header{
-    height: 40px!important;
-    line-height: 40px;
-  }
   .el-main{
     overflow: hidden;
+  }
+  .el-button--mini, .el-button--small {
+    font-size: 15px;
   }
 </style>
 <style>

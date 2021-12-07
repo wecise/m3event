@@ -109,7 +109,6 @@
                 </el-container>
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="dialog.attachment.show = false">取 消</el-button>
-                    <el-button type="primary" @click="dialog.attachment.show = false">确 定</el-button>
                 </span>
             </el-dialog>
             <el-table
