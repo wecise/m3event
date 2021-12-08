@@ -1021,14 +1021,7 @@ export default {
     }
 
     /* Event Console Table */
-    .el-table {
-        height:100%!important;
-        overflow: hidden!important;
-        -webkit-user-select:none;/*谷歌 /Chrome*/
-        -moz-user-select:none; /*火狐/Firefox*/
-        -ms-user-select:none;    /*IE 10+*/
-        user-select:none;
-    }
+    
     .el-table--small td, 
     .el-table--small th {
         padding: 4px 0;

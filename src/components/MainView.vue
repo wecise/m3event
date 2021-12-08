@@ -78,7 +78,7 @@
           <!-- 规则管理 -->
           <RuleView :model="item.data" :global="global" v-else-if="item.callback==='RuleView'"></RuleView>
           <!-- 任务管理 -->
-          <JobView :model="item.data" :global="global" v-else-if="item.callback==='JobView'"></JobView>
+          <JobView v-else-if="item.callback==='JobView'"></JobView>
           <!-- 接口管理 -->
           <FsView :model="item.data" :global="global" v-else-if="item.callback==='FsView'"></FsView>
           <!-- 策略管理 -->
@@ -100,20 +100,6 @@
 
 import _ from 'lodash';
 import EventList from './EventList.vue';
-/*import DiagnosisView from './diagnosis/DiagnosisView';
-import SmartGroupView from './diagnosis/SmartGroupView';
-import EntityView from './diagnosis/EntityView';
-import CtmenuKeepView from './contextmenu/EditView';
-import SeverityView from './utils/SeverityView';
-import DashView from './dashview/DashView';
-import NotifyView from './notify/NotifyView';
-import RuleView from './rule/RuleView';
-import CollectorView from './collector/RuleView';
-import JobView from './job/JobView';
-import FsView from './api/FsView';
-import PolicyView from './policy/PolicyView';
-import TriggerView from './trigger/TriggerView';
-import PipeView from './pipe/PipeView'; */
 
 export default {
   name: "MainView",
@@ -130,7 +116,7 @@ export default {
     DashView: resolve => {require(['./dashview/DashView.vue'], resolve)},
     NotifyView: resolve => {require(['./notify/NotifyView.vue'], resolve)},
     RuleView: resolve => {require(['./rule/RuleView.vue'], resolve)},
-    JobView: resolve => {require(['./job/JobView.vue'], resolve)},
+    JobView: resolve => {require(['./job/index.vue'], resolve)},
     FsView: resolve => {require(['./api/FsView.vue'], resolve)},
     PolicyView: resolve => {require(['./policy/PolicyView.vue'], resolve)},
     TriggerView: resolve => {require(['./trigger/TriggerView.vue'], resolve)},
