@@ -9,7 +9,9 @@ function resolve(dir) {
     return path.join(__dirname, dir)
 }
 
-module.exports = {
+const m3config = require("@wecise/m3js/mbase/vue.config")
+
+module.exports = m3config({
     devServer: {
         port: 8080,
         contentBase: [
@@ -45,6 +47,9 @@ module.exports = {
             },
             "/help":{
                 target: `http://${process.env.VUE_APP_M3_HOST}/help`
+            },
+            "/mxobject":{
+                target: `http://${process.env.VUE_APP_M3_HOST}`
             }
         }
     },
@@ -52,60 +57,14 @@ module.exports = {
     outputDir: 'app/matrix/' + process.env.VUE_APP_M3_APP,
     productionSourceMap: false,
 
-    configureWebpack: config => {
-        // 生产环境
-        if (IS_PROD) {
-            return {
-                plugins: [
-                    new CompressionPlugin({
-                        test: new RegExp(
-                            '\\.(' + productionGzipExtensions.join('|') + ')$'
-                        ),
-                        threshold:10240,
-                        minRatio: 0.8,
-                        deleteOriginalAssets:false
-                    }),
-                    new WebpackZipPlugin({
-                        initialFile: 'app',
-                        endPath: './',
-                        zipName: process.env.VUE_APP_M3_APP+'.zip',
-                        //frontShell: 'sed -i \'\' \'s/src="/src="\\/static\\/app\\/matrix\\/m3event/g\; s/href="/href="\\/static\\/app\\/matrix\\/m3event/g\' ./app/matrix/m3event/index.html',
-                        //frontShell: 'sed -i \'\' \'s/src="/src="\\/static\\/app\\/matrix\\/m3event/g\; s/href="/href="\\/static\\/app\\/matrix\\/m3event/g\' ./app/matrix/m3event/index.html',
-                        behindShell: './deploy.sh ' + process.env.VUE_APP_M3_HOST + ' ' + process.env.VUE_APP_M3_COMPANY + ' ' + process.env.VUE_APP_M3_USERNAME + ' "' + process.env.VUE_APP_M3_PASSWORD + '" ' + process.env.VUE_APP_M3_APP + ' ' + process.env.VUE_APP_M3_TITLE + ' ' + process.env.VUE_APP_M3_VERSION
-                    })
-                ]
-            }
+    configureWebpack: {
+        entry: {
+            app: "./src/main.js"
         }
-      },
+    },
 
-      chainWebpack(config) {
+    chainWebpack(config) {
 
-        /* config.optimization.splitChunks({
-            chunks: 'all',
-            maxSize: 3000000,
-            maxInitialRequests:30,
-            cacheGroups: {
-                libs: {
-                    name: 'chunk-libs',
-                    test: /[\\/]node_modules[\\/]/,
-                    priority: 10,
-                    chunks: 'initial' // only package third parties that are initially dependent
-                },
-                brace: {
-                    name: 'chunk-brace', // split brace into a single package
-                    priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-                    test: /[\\/]node_modules[\\/]_?brace(.*)/ // in order to adapt to cnpm
-                },
-                commons: {
-                    name: 'chunk-commons',
-                    test: resolve('src/components'), // can customize your rules
-                    minChunks: 3, //  minimum common number
-                    priority: 5,
-                    reuseExistingChunk: true
-                }
-            }
-        }) */
-        
         // ============压缩图片 start============
         config.module
             .rule('images')
@@ -138,4 +97,4 @@ module.exports = {
     },
 
     publicPath: process.env.NODE_ENV === 'production'?'/static/app/matrix/'+process.env.VUE_APP_M3_APP:''
-}
+})

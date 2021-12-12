@@ -20,6 +20,7 @@
         <el-tab-pane label="策略定义" name="policy">
             <el-container style="height: calc(100vh - 275px);">
                 <el-header style="height: 35px;line-height: 35px;background:#f2f2f2;display:flex;">
+
                     <el-tooltip content="刷新" >
                         <el-button type="text" @click="initData">
                             <svg-icon icon-class="refresh" style="width: 1.3em;height: 1.3em;"/>
@@ -56,14 +57,15 @@
                                     </el-dropdown>
                                 </el-tooltip>
                             </el-header>
-                            <el-main>
+                            <el-main style="overflow:hidden;">
                                 <VueEditor
                                     v-model="editor.data"
                                     @init="onEditorInit"
                                     :lang="editor.lang.value"
                                     :theme="editor.theme.value"
-                                    width="99.8%"
+                                    width="100%"
                                     height="100%"
+                                    style="border:1px solid #dddddd;"
                                     ref="editor"
                                 ></VueEditor>
                             </el-main>
@@ -73,19 +75,25 @@
                         </el-button>
                     </el-popover>
                     
-                    <el-tooltip content="文件导入" >
+                    <!-- <el-tooltip content="文件导入" >
                         <el-button type="text" @click="onUploadFromFile" style="padding-left:10px;">
                             <svg-icon icon-class="documentation" style="width: 1.0em; height: 1.0em;"/>
                         </el-button>
-                    </el-tooltip>
+                    </el-tooltip> -->
 
                     <el-tooltip content="保存" >
-                        <el-button type="text" @click="onApplyPolicy" :loading="policy.loading">
+                        <el-button type="text" @click="onApplyPolicy" :loading="policy.loading" style="padding-left:10px;">
                             <svg-icon icon-class="save" style="width: 1.2em;height: 1.2em;"/>
                         </el-button>
                     </el-tooltip>
 
-                    <el-input v-model="policy.dt.term" placeholder="关键字过滤" @change="onFilter" @clear="initData" clearable style="padding-left:15px;width:30%;"></el-input>
+                    <el-input v-model="policy.dt.term" 
+                        placeholder="关键字过滤" 
+                        @change="onFilter" 
+                        @clear="initData" 
+                        clearable 
+                        style="padding-left:15px;width:30%;" 
+                        size="mini"></el-input>
 
                     <span>
                         
@@ -162,6 +170,37 @@
                     <span style="float:right;"><el-button @click="onClose">取消</el-button></span>
                 </el-footer>
             </el-container>
+            <!-- 上传 -->
+            <el-dialog title="上传" 
+                :visible.sync="dialog.upload.show" 
+                :destroy-on-close="true"
+                :append-to-body="true"
+                :close-on-click-modal="false"
+                :close-on-press-escape="false"
+                width="40%!imortant"
+                center
+                v-if="dialog.upload.show">
+                <el-container>
+                    <el-main style="text-align: center;">
+                        <el-upload drag
+                            multiple
+                            :action="dialog.upload.url"
+                            :data="dialog.upload.ifIndex"
+                            :on-success="onUploadSuccess"
+                            :on-error="onUploadError"
+                            :on-remove="onUploadRemove"
+                            :list-type="text"
+                            :show-file-list="true"
+                            name="uploadfile">
+                            <i class="el-icon-upload"></i>
+                        </el-upload>
+                    </el-main>
+                    <el-footer>
+                        <i class="el-icon-s-data"></i> 上传文件：{{dialog.upload.fileList.length}}
+                    </el-footer>
+                </el-container>
+            </el-dialog>
+            <!-- 从文本粘贴 -->
             <el-dialog
                 title="粘贴自文本"
                 :visible.sync="dialog.copyFrom.show"
@@ -194,8 +233,9 @@
 import _ from 'lodash';
 import TagView from '../tags/TagView';
 import Papa from 'papaparse';
-import { HotTable } from '@handsontable/vue';
 import Handsontable from 'handsontable';
+import { HotTable } from '@handsontable/vue';
+
 
 export default {
   name: "EditView",
@@ -208,7 +248,7 @@ export default {
     HotTable
   },
   data() {
-    return {   
+    return {
         policy: {
             loading: false,
             data: null,
@@ -326,7 +366,13 @@ export default {
                 show: false
             },
             upload: {
-                show: false
+                show: false,
+                url: '/fs/etc/extend?issys=true',
+                ifIndex: {index:true},
+                data: {
+                    parent: '/etc/extend'
+                },
+                fileList: []
             }
         }
     };
@@ -357,6 +403,9 @@ export default {
       
   },
   methods: {
+    onRefresh(){
+        this.initData();
+    },
     initFileInfo(){
         try{
             
@@ -410,8 +459,9 @@ export default {
 
             this.initFileInfo();
 
+
         }).catch((err)=>{
-            console.log(err);
+            console.error(err);
             this.policy.data = null;
         })
     },
@@ -421,6 +471,40 @@ export default {
     },
     onUploadFromFile(){
         this.dialog.upload.show = true;
+    },
+    onUploadSuccess(res,file,FileList){
+        this.dialog.upload.fileList = FileList;
+        
+        _.forEach(FileList,(v)=>{
+            let attr = {remark: '', rate: '0'};
+            this.m3.dfs.updateAttr({parent:v.parent, name:v.name, attr:attr});
+        })
+
+        // 刷新
+        this.onRefresh();
+
+        this.$message({
+            type: "success",
+            dangerouslyUseHTMLString: true,
+            message: `上传成功！`
+        })
+
+        this.dialog.upload.show = false;
+
+    },
+    onUploadError(){
+        this.$message({
+            type: "error",
+            dangerouslyUseHTMLString: true,
+            message: `上传失败，请确认！`
+        })
+    },
+    onUploadRemove(file, fileList) {
+        
+        this.m3.dfs.deleteFile({parent:this.dialog.upload.data.parent, name:file.name}).then(rtn=>{
+            this.onRefresh(this.dialog.upload.data,null);
+        });
+        
     },
     onApplyInfo(){
         this.onApplyName();
@@ -562,4 +646,4 @@ export default {
         z-index: 3000;
     }
 </style>
-<style src="../../../node_modules/handsontable/dist/handsontable.full.css"></style>
+<style src="../../../node_modules/handsontable/dist/handsontable.full.min.css"></style>

@@ -1,4 +1,4 @@
-const m3 = require("@wecise/m3js");
+const m3 = require("@wecise/m3js")
 import Vue from 'vue'
 import App from './App.vue'
 
@@ -24,8 +24,9 @@ Vue.config.productionTip = false;
 window.moment = moment;
 window.M3_LANG = 'zh-CN';
   
+
 m3.init().then(()=>{
-    Vue.prototype.$ELEMENT = { size: 'small', zIndex: 3000 };
+    Vue.prototype.$ELEMENT = { size: 'mini', zIndex: 3000 };
     new Vue({
         render: h => h(App)
     }).$mount('#app')

@@ -213,7 +213,7 @@ export default {
                                 
                                 if(_.includes(val,'_')) return;  
 
-                                return {field: val, title: val, ftype: 'varchar', width:120, visible:true};
+                                return {field: val.name, title: val.title || val.name, ftype: val.ftype, width:120, visible:true};
                                 
                             }));
                         }
@@ -290,7 +290,7 @@ export default {
         let attr = {
             parent: this.view.model.info.parent, 
             name: [this.view.model.info.name, this.view.model.info.ftype].join("."),
-            attr: JSON.stringify(this.view.model.info.attr)
+            attr: this.view.model.info.attr
         };
 
         this.m3.dfs.updateAttr(attr).then(()=>{
@@ -345,17 +345,17 @@ export default {
             this.view.model.datasource.name = `${data.class}/${_.now()}`
             this.view.model.datasource.class = data.class;
             
-            this.m3.getClassFieldsById(data.id).then(res=>{
-                this.datasource.fields = _.compact(_.map(res.message,(v)=>{
-                    if(_.includes(v,'_')) return;  
-                    return {field: v.name, title: v.title, ftype: v.ftype, width:120, visible:true};
-                }))
-                
-                if(this.view.model.datasource.fields){
-                    // _.extend(this.datasource.fields,this.view.model.datasource.fields.data);    
-                    this.view.model.datasource.fields = [];
-                }
-            })
+            //this.m3.getClassFieldsById(data.id).then(res=>{
+            this.datasource.fields = _.compact(_.map(data.fieldsObj,(v)=>{
+                if(_.includes(v,'_')) return;  
+                return {field: v.name, title: v.title, ftype: v.ftype, width:120, visible:true};
+            }))
+            
+            if(this.view.model.datasource.fields){
+                // _.extend(this.datasource.fields,this.view.model.datasource.fields.data);    
+                this.view.model.datasource.fields = [];
+            }
+            //})
         }
         
         if(data.class !== this.view.model.datasource.class && !_.isEmpty(this.view.model.datasource.class)){

@@ -6,7 +6,9 @@
     </el-header>
     <el-main class="card-main">
         <el-card :body-style="{ padding: '10px' }" 
-            style="text-align: center;padding:0px;cursor:pointer;" :key="index" v-for="(item,index) in dt.rows"
+            style="text-align: center;padding:0px;cursor:pointer;" 
+            :key="index" 
+            v-for="(item,index) in dt.rows"
             @dblclick.native="onEdit(item)"
             shadow="hover">
             <el-dropdown style="position: absolute;right: 5px;top: 5px;cursor:pointer;">
@@ -36,7 +38,9 @@
         </el-card>
       
     </el-main>
+    <!-- 触发器 -->
     <el-dialog title="触发器" 
+        width="80%"
         :visible.sync="dialog.newTrigger.show" 
         :show-close="false"
         :close-on-press-escape="true"
@@ -241,7 +245,7 @@ export default {
             disable: "true",
             before: "true",
             level: "1",
-            vtime: _.now(),
+            vtime: "",
             class: "",
             script: ""
           }
@@ -251,7 +255,11 @@ export default {
   },
   filters:{
     formatTime(value){
-      return new Date(value).toLocaleString();//format(window.global.register.format);
+      if(!_.isEmpty(value)){
+        return new Date(value).toLocaleString();
+      }else{
+        return new Date().toLocaleString();
+      }
     },
     formatName(value){
       return value.split(".")[0];
@@ -422,10 +430,23 @@ export default {
     padding: 0;
     align-content: flex-start;
   }
+  
   .el-card{
     position: relative;
-    margin:10px;
+    max-width: 25em;
+    width: 25em;
+    height: auto;
+    border-radius: 10px !important;
+    border: unset;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 5px 0px;
+    background: rgb(239, 244, 246);
+    margin: 10px;
   }
+
+  .el-card+.el-card{
+    margin: 10px;
+  }
+
   .time {
     font-size: 12px;
     color: #999;

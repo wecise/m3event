@@ -165,7 +165,7 @@
                         :style="btn[2] | severityBtnStyle(dt.summary[key],dtOptions)"
                         @click="onToggleSeverity(btn,key)"
                         :class="checkSeverity(key)">
-                        {{ btn[1] }} <span style="font-variant: all-small-caps;">{{btn[0]}}</span> {{ dt.summary[key]?dt.summary[key].length:0 }}
+                        {{ btn[1] }} <span style="font-variant: all-mini-caps;">{{btn[0]}}</span> {{ dt.summary[key]?dt.summary[key].length:0 }}
                     </el-button>
                 </el-button-group>
             </div>
@@ -254,7 +254,6 @@ export default {
   name: "EventList",
     props: {
         model: Object,
-        global: Object,
         options: Object,
         height: String,
         rowClass: {
@@ -270,7 +269,7 @@ export default {
     data(){
    
         return {
-            
+            global: this.m3.global,
             dt:{
                 options: {
                     header:true,
@@ -430,8 +429,7 @@ export default {
         },
         dtMainStyle(){
             if(this.dtOptions.header){
-                return `border-top: 1px solid #dddddd;
-                        padding: 0px;
+                return `padding: 0px;
                         overflow: hidden;`
             } else {
                 return `padding: 0px;
@@ -485,8 +483,6 @@ export default {
     },
     mounted(){  
         
-        window.global = this.global;
-
         this.$refs.table.bodyWrapper.addEventListener('scroll', (evt) => {
             // 滚动距离
             let scrollTop = Math.round(evt.target.scrollTop); 
@@ -500,9 +496,6 @@ export default {
             // 脚底
             if (scrollTop + windowHeight === scrollHeight) {
                 this.onLoadMore(); 
-                /* _.delay(()=>{
-                    evt.target.scrollTop = evt.target.scrollTop - 100;
-                }) */
             }
             
         })
@@ -512,7 +505,7 @@ export default {
             return _.includes(this.dt.selectedSeverity,key)?'severity-active':'';
         },
         onToolsCommand(){
-            document.querySelector(".el-dropdown-menu.el-popper.el-dropdown-menu--small").style.display = 'none';
+            document.querySelector(".el-dropdown-menu.el-popper.el-dropdown-menu--mini").style.display = 'none';
         },
         onToggleSeverity(btn,key){
             this.dt.selectedSeverity = _.xor(this.dt.selectedSeverity,[key]);
@@ -807,8 +800,8 @@ export default {
         onToggle(){
             this.$root.toggleModel(_.without(['view-normal','view-tags'],window.EVENT_VIEW).join(""));
         },
-        onExport(type){
-            this.dt.downloadLoading = true;
+        onExport(){
+            /* this.dt.downloadLoading = true;
             let formatJson = (filterVal, jsonData)=>{
                 return jsonData.map(v => filterVal.map(j => {
                     if (_.includes(['day','ctime','vtime'],j)) {
@@ -831,7 +824,7 @@ export default {
                     bookType: type
                 })
                 this.dt.downloadLoading = false;
-            })
+            }) */
             
         },
         openPanel(){
@@ -926,16 +919,11 @@ export default {
 
 <style scoped>
 
-    .el-container{
-        border: 1px solid #dddddd!important;
-    }
-
     .el-header{
         height:30px!important;
         line-height:30px;
-        background:#f2f2f2;
         padding:0 10px;
-        border-bottom: 1px solid #ffffff;
+        background: #f2f2f2;
     }
 
     
@@ -944,7 +932,7 @@ export default {
         overflow: auto;
     }
 
-    .el-main > .el-table .el-table--small td{
+    .el-main > .el-table .el-table--mini td{
         padding: 0px;
     }
 
@@ -1022,8 +1010,8 @@ export default {
 
     /* Event Console Table */
     
-    .el-table--small td, 
-    .el-table--small th {
+    .el-table--mini td, 
+    .el-table--mini th {
         padding: 4px 0;
     }
     .el-table .cell {
@@ -1040,6 +1028,7 @@ export default {
         /* filter: drop-shadow(black 2px 4px 6px); */
         border-top: 2px solid #333333!important;
     }
+
 </style>
 
 <style>

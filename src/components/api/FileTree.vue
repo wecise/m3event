@@ -40,13 +40,15 @@
                     auto-expand-parent
                     @node-click="onNodeClick"
                     :filter-node-method="onFilterNode"
-                    :expand-on-click-node="false"
+                    expand-on-click-node
                     style="background:transparent;"
                     ref="tree">
                 <span slot-scope="{ node, data }" style="width:100%;height:30px;line-height: 30px;"  @mouseenter="onMouseEnter(data)" @mouseleave="onMouseLeave(data)">
-                    <span v-if="data.ftype=='dir'">
+                    <span v-if="data.ftype==='dir'">
                         <i class="el-icon-folder" style="color:#FFC107;"></i> 
-                        <span> {{node.label}}</span>
+                        <span> {{node.label}}
+                            <span v-if="data.children">({{data.children.length}})</span>
+                        </span>
                         <el-dropdown v-show="data.show" style="float:right;width:14px;padding-right:10px;">
                             <span class="el-dropdown-link">
                                 <i class="el-icon-more el-icon--right"></i>
@@ -165,7 +167,7 @@ export default {
         },
         onRefresh(item){
             this.m3.dfs.list(item).then( (rtn)=>{
-                this.$set(item, 'children', _.sortBy(rtn.message, ['fullname'],['asc']));
+                this.$refs.tree.updateKeyChildren(item.fullname, _.sortBy(rtn.message, ['fullname'],['asc']));
             } );
         },
         onNewDir(item){
@@ -374,7 +376,7 @@ export default {
                     let param = {parent: data.fullname, fullname: data.fullname };
                     this.m3.dfs.list(param).then( (rtn)=>{
                         let children = _.sortBy(rtn.message,'fullname');
-                        this.$set(data, 'children', children);
+                        this.$refs.tree.updateKeyChildren(data.fullname, children);
                     } )
                 }
 
@@ -424,7 +426,7 @@ export default {
                     message: h('span', null, [
                         h('p', null, `文件名称：${file.name}`),
                         h('p', null, `修改时间：${file.lastModifiedDate}`),
-                        h('p', null, `文件大小：${this.m3.utils.bytesToSize(file.size)}`)
+                        h('p', null, `文件大小：${this.m3.utils.bytesSize(file.size)}`)
                     ]),
                     showCancelButton: true,
                     confirmButtonText: '确定',

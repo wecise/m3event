@@ -37,7 +37,7 @@
               </el-input>
             </el-header>
             <el-main class="event-console-el-main">
-              <EventList ref="eventList" :model="search.result.list" :global="global" :options="search.result.options"
+              <EventList ref="eventList" :model="search.result.list" :options="search.result.options"
                 @onSearch="onSearch" 
                 @DiagnosisView="((data)=>{ addTab(data.row,data.menu) })"
                 @severity:change="onSearchBySeverity"

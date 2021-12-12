@@ -1,17 +1,17 @@
 <template>
-<el-container style="background:#f2f2f2;">
+<el-container style="background:#f2f2f2;height: calc(100vh - 115px);">
     <el-main style="padding: 0px;">
         <Split :gutterSize="5">
-            <SplitArea :size="20" :minSize="0" style="overflow:hidden;">
+            <SplitArea :size="15" :minSize="0" style="overflow:hidden;">
                 <TagTreeView :model="{domain:'dashview'}" :fun="onRefreshByTag" ref="dashviewTagTree"></TagTreeView>
             </SplitArea>
-            <SplitArea :size="80" :minSize="0" style="overflow:hidden;padding:20px;">
-              <el-container>
-                <el-header>
+            <SplitArea :size="85" :minSize="0" style="overflow:hidden;">
+              <el-container style="height: calc(100vh - 130px);">
+                <el-header style="line-height: 60px;">
                     <el-button type="default" icon="el-icon-refresh" @click="onRefresh">刷新</el-button>
                     <el-button type="success" icon="el-icon-plus" @click="onNew">新建</el-button>
                 </el-header>
-                <el-main>
+                <el-main style="padding:0 15px;display: -webkit-flex;display: flex;flex-wrap: wrap;align-content: flex-start;">
                   
                     <el-card :body-style="{ padding: '10px' }" 
                         style="text-align: center;padding:0px;cursor:pointer;" :key="index" v-for="(item,index) in dt.rows"
@@ -31,7 +31,8 @@
                             <span>{{item.name | formatName}}</span>
                              <p style="text-align:left;"><TagView domain='dashview' :model.sync="item.tags" :id="item.id" :limit="1"></TagView></p>
                             <div class="bottom clearfix">
-                              <time class="time">创建时间:{{  item.ctime | formatTime}}</time>
+                              <p><time class="time"> 创建时间: {{  item.ctime | formatTime}}</time></p>
+                              <p><time class="time"> 修改时间: {{  item.mtime | formatTime}}</time></p>
                             </div>
                         </div>
                         <div style="text-align:right;color: #999;">
@@ -42,7 +43,10 @@
                     </el-card>
                   
                 </el-main>
-
+                <el-footer style="height: 30px;line-height: 30px;width: 100%;padding:0 20px">
+                    总计：{{dt.rows.length}}
+                </el-footer>
+                <!-- 视图编辑 -->
                 <el-dialog :title="'视图编辑 ' + dt.selected.name.replace(/.json/,'')" 
                     :visible.sync="edit.show" 
                     :show-close="false"
@@ -51,6 +55,7 @@
                     :destroy-on-close="true"
                     dialogDrag
                     dialogChange
+                    width="80%"
                     custom-class="dashview"
                     v-if="dt.selected">
                   <EditView :model.sync="dt.selected" ref="editView" @dialog:close="onClose" @view-delete="(()=>{ edit.show=false; this.onRefresh();})"></EditView>
@@ -109,7 +114,7 @@ export default {
     initData(){
         let param = encodeURIComponent(JSON.stringify({  action: "list"  }));
         this.m3.callFS("/matrix/m3event/view/action.js", param).then((rtn)=>{
-            this.dt.rows = _.orderBy(rtn.message,['name'],['asc']);
+            this.dt.rows = _.orderBy(rtn.message,['name','ctime'],['asc','desc']);
             this.edit.show = false;
         })
     },
@@ -142,17 +147,17 @@ export default {
             return false;
         }
 
-        let param = encodeURIComponent(JSON.stringify({  action: "add", data:this.m3.EventViewDataObj, name:value }));
+        let param = encodeURIComponent(JSON.stringify({  action: "add", data:this.m3.event.EventViewDataObj, name:value }));
         this.m3.callFS("/matrix/m3event/view/action.js", param).then((rtn)=>{
             this.dt.rows = rtn.message;
             this.onRefresh();
         })
 
         
-      }).catch(err => {
+      }).catch(() => {
         this.$message({
           type: 'info',
-          message: '取消新建视图操作 ' + err
+          message: '取消新建视图操作'
         });       
       });
       
@@ -172,7 +177,7 @@ export default {
       this.$confirm(`确定要删除该视图 ${item.name}, 是否继续?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'error'
+        type: 'warning'
       }).then(() => {
        
         this.m3.dfs.deleteFile(item).then(()=>{
@@ -190,10 +195,10 @@ export default {
             this.onRefresh();
           },1000)
         });
-      }).catch(err => {
+      }).catch(() => {
         this.$message({
           type: 'info',
-          message: '已取消删除 ' + err
+          message: '已取消删除'
         });          
       })
     },
@@ -208,25 +213,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .el-container{
-    height: calc(100vh - 115px);
-  }
-  .el-header{
-     height: 30px!important;
-    line-height: 30px;
-  }
-  .el-main{
-     display: -webkit-flex;
-      display: flex;
-      flex-wrap: wrap;
-      align-content: flex-start;
-      padding: 10px;
-  }
+  
   .el-card{
     position: relative;
-    margin:10px;
-    width: 20em;
-    height: 19em;
+    margin:5px;
+    width: 22em;
+    max-width: 22em;
+    height: 20em;
+  }
+  .el-card+.el-card{
+    margin:5px;
   }
   .time {
     font-size: 12px;
@@ -236,6 +232,7 @@ export default {
   .bottom {
     margin-top: 13px;
     line-height: 12px;
+    text-align: left;
   }
 
   .button {
