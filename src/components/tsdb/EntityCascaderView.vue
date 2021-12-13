@@ -2,6 +2,7 @@
     <div style="background: #f2f2f2;padding: 5px 20px 20px 20px;;">
         <h4>实体名称：{{selectedEntity}}</h4> 
         <span style="font-weight:600;">选择指标：</span>
+        
         <el-cascader
             :options="buckets"
             :props="defaultProps"
@@ -17,6 +18,7 @@
                 <span style="color:#999999;font-size:10px;text-align:right;" v-else> {{ data.ptype }}</span>
             </template>
         </el-cascader>
+        
     </div>
 </template>
 

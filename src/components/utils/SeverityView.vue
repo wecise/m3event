@@ -13,6 +13,7 @@
         :data="dt.rows"
         :highlight-current-row="true"
         stripe
+        border
         style="width:100%;"
         ref="table"
         v-if="dt.rows"
@@ -22,14 +23,10 @@
             :label="item.title" 
             :prop="item.field"
             show-overflow-tooltip
-            sortable 
+            sortable
             :key="index" v-if="item.visible">
             <template slot-scope="scope">
-              <el-color-picker
-                :value="scope.row.color"
-                show-alpha
-                v-if="item.field==='color'">
-              </el-color-picker>
+              <el-button type="default" size="mini" :style="'background:'+scope.row.color" v-if="item.field==='color'"></el-button>
               <el-tag v-else-if="item.field==='name'">{{scope.row[item['field']]}}</el-tag>
               <div style="font-weight:600;padding-left:20px;" v-else>{{scope.row[item['field']]}}</div>
             </template>
@@ -39,8 +36,8 @@
           label="操作"
           width="120">
           <template slot-scope="scope">
-            <el-button @click="onEdit(scope.row)" type="text">编辑</el-button>
-            <el-button @click="onDelete(scope.row)" type="text">删除</el-button>
+            <el-button @click="onEdit(scope.row)" type="text" style="color:#666666;">编辑</el-button>
+            <el-button @click="onDelete(scope.row)" type="text" style="color:#666666;">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

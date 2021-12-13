@@ -117,7 +117,7 @@
                 :highlight-current-row="true"
                 :row-class-name="rowClassName"                
                 @row-contextmenu="onRowContextmenu"
-                @row-dblclick="onRowContextmenu"
+                @row-dblclick="onRowDblClick"
                 @row-click="onRowClick"
                 @current-change="onCurrentChange"
                 @selection-change="(data)=>{ dt.selected = data; }"
@@ -129,7 +129,7 @@
                 style="width:100%;">
                 <el-table-column label="序号" type="index" show-overflow-tooltip width="50">
                 </el-table-column>
-                <el-table-column type="selection" align="center"></el-table-column> 
+                <el-table-column type="selection" align="center" width="50"></el-table-column> 
                 <template v-for="(item,index) in dt.columns">
                     <el-table-column 
                         :prop="item.field"
@@ -653,6 +653,11 @@ export default {
             event.preventDefault();
             this.$refs.contextmenu.open(event,row);
             this.dt.contextmenu.show = true;
+        },
+        // row双击事件
+        onRowDblClick(row){
+            let menu = {"component":{"name":"DiagnosisView"},"icon":"","id":1,"name":"告警分析","type":"component"};
+            this.$emit("DiagnosisView",{row:row,menu:menu});
         },
         // row单击事件
         onRowClick(row){

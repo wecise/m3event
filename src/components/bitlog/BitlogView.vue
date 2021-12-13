@@ -10,7 +10,6 @@
                     v-model="bitlog.buckets"
                     :options="buckets"
                     :props="{ multiple: true,checkStrictly: false }"
-                    clearable
                     @change="onBucketChange"
                     style="width:90%;">
                 </el-cascader>

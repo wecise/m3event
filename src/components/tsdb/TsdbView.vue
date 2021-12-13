@@ -20,7 +20,8 @@
                 <el-tag
                     :key="index" v-for="(tag,index) in selectedBuckets"
                     closable
-                    style="margin:2px;">
+                    style="margin:2px;"
+                    @close="onTagClose(tag)">
                     {{tag[0]}}/{{tag[1]}}
                 </el-tag>
             </h4>
@@ -397,6 +398,18 @@ export default{
         onRemoveItem(val) {
             const index = this.kpi.list.map(item => item.i).indexOf(val);
             this.kpi.list.splice(index, 1);
+        },
+        onTagClose(tag){
+            let cascader = this.$refs.bucketKeys.$refs.cascader;
+            let selected = this.$refs.bucketKeys.selected.bucketKeys;
+            let index = selected.indexOf(tag);
+            
+            selected.splice(index,1);
+            cascader.checkedNodes[index].checked = false;
+            if(cascader.checkedNodes[index].parent && cascader.checkedNodes[index].parent.children.length===1){
+                cascader.checkedNodes[index].parent.checked = false;
+            }
+
         }
     }
 }
