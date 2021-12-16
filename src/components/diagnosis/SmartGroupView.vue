@@ -16,6 +16,8 @@
                     </el-header>
                     <el-main style="overflow:hidden;">
                         <el-table
+                            v-loading="smartGroup.loading"
+                            element-loading-spinner="el-icon-loading"
                             :data="smartGroup.dt.rows"
                             :highlight-current-row="true"
                             :row-class-name="rowClassName"                
@@ -58,6 +60,7 @@
                         <EventList ref="eventList" 
                             id="smartGroupTable"
                             :model="dt" 
+                            :refreshEnable="false" 
                             :global="global" 
                             :options="dt.options" 
                             rowClass="smartGroupEvent"
@@ -93,6 +96,7 @@ export default {
     return {
         ids: [],
         smartGroup:{
+            loading:false,
             dt: {
                 rows: [],
                 columns: [],
@@ -161,7 +165,7 @@ export default {
         this.initData();
     },
     initData(){
-        
+        this.smartGroup.loading = true;
         this.smartGroup.dt.rows = [];
         this.graph.model = [];
         this.dt.rows = [];
@@ -185,6 +189,11 @@ export default {
             
             _.extend(this.smartGroup.dt, { rows: rt.rows });
 
+            this.smartGroup.loading = false;
+
+        }).catch(err=>{
+            console.error(err);
+            this.smartGroup.loading = false;
         })
     },
     onSmartGroupSelectionChange(row){

@@ -399,7 +399,7 @@ export default {
         if(_.includes(icon,'http://')){
             return icon;
         } else {
-            return `/static/assets/images/entity/png/${icon}.png`;
+            return `${window.assetsURLBase}/images/entity/png/${icon}.png`;
         }
 
     },
@@ -1174,7 +1174,7 @@ export default {
     },
     // 节点状态渲染图标
     createOverlayByTip(image, tooltip) {                  
-        let overlay = new mxCellOverlay(new mxImage(`/static/assets/images/apps/png/severity/${image}.png`,24,24), tooltip, mxConstants.ALIGN_RIGHT, mxConstants.ALIGN_TOP, new mxPoint(-10,15));
+        let overlay = new mxCellOverlay(new mxImage(`${window.assetsURLBase}/images/apps/png/severity/${image}.png`,24,24), tooltip, mxConstants.ALIGN_RIGHT, mxConstants.ALIGN_TOP, new mxPoint(-10,15));
         return overlay;
     },
     // 删除选择的节点
@@ -1256,14 +1256,17 @@ export default {
                 message: "没有该实体 "
             })
         }
-    }
+    },
   },
+  destroyed(){
+      clearInterval(this.graph.control.refresh.inst);
+  }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     .el-container{
-        height: calc(100vh - 190px)!important;
+        height: calc(100vh - 205px)!important;
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <el-container>
+    <el-container style="height: calc(100vh - 201px);background: #f2f2f2;" @mouseover.native="onLayout">
         <el-header style="height:auto!important;min-height:60px!important;padding:10px;">
              <div style="display:flex;">
                 <span>
@@ -41,13 +41,13 @@
                                 <el-main style="padding: 10px 0 0 0;">
                                     <el-table
                                         ref="attrTable"
+                                        height="50vh"
                                         border
                                         stripe
                                         :data="attr.dt.rows"
                                         tooltip-effect="dark"
                                         style="width: 100%"
-                                        @selection-change="onAttrSelectionChange"
-                                        class="diagnosis-attr-table">
+                                        @selection-change="onAttrSelectionChange">
                                         <el-table-column
                                             type="selection"
                                             width="55">
@@ -83,6 +83,7 @@
             <EventList ref="eventList" 
                 :model="result.dt" 
                 :global="global" 
+                :refreshEnable="false" 
                 :options="result.dt.options" 
                 rowClass="historySameEvent" 
                 @DiagnosisView="onDiagnosis">
@@ -182,7 +183,7 @@ export default {
                         header:false,
                         dtContainerHeight: '290px',
                         severityBar: false
-                        }
+                    }
                 }
             }
         }
@@ -219,28 +220,12 @@ export default {
         this.initAttr();
     },
     methods:{
+        onLayout(){
+            this.$nextTick(()=>{
+                this.$refs.eventList.$refs.table.doLayout();
+            })
+        },
         initData(){
-            /* let param = encodeURIComponent(JSON.stringify(this.model).replace(/%/g,'%25'));
-            this.m3.callFS("/matrix/m3event/diagnosis/history.js", param).then((rtn)=>{
-                let rt = rtn.message;
-                _.extend(this.result.dt, {columns: _.map(rt.columns, (v)=>{
-                    
-                    if(_.isUndefined(v.visible)){
-                        _.extend(v, { visible: true });
-                    }
-
-                    if(!v.render){
-                        return v;
-                    } else {
-                        return _.extend(v, { render: eval(v.render) });
-                    }
-                    
-                })});
-                
-                _.extend(this.result.dt, { rows: rt.rows });
-
-            }) */
-
             this.attr.dt.rows = _.compact(_.map(this.model, (v,k)=>{
                                     if(!v) return;
                                     return {name:k, value:v};
@@ -314,6 +299,9 @@ export default {
                 })});
                 
                 _.extend(this.result.dt, { rows: rt.rows });
+
+                _.extend(this.result.dt, { summary:rt.summary });
+
             } )
         },
     }
@@ -322,12 +310,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    .el-container{
-        height: calc(100vh - 190px)!important;
-        background: #f2f2f2;
-        border:unset!important;
-    }
-
+    
     .el-main{
         padding: 0px;
         overflow: hidden;

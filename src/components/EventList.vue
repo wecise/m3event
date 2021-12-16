@@ -1,5 +1,5 @@
 <template>
-    <el-container :style="dtContainerHeight" class="event-console">
+    <el-container :style="dtContainerHeight" class="event-console" @mouseover.native="onLayout">
         <el-header v-if="dtOptions.header">
             
             <el-tooltip content="刷新"  placement="top">
@@ -60,7 +60,7 @@
 
                         <ToolsView @tool-click="((data)=>{onToolsKeep(data)})" @click.native="onToolsCommand"></ToolsView>
 
-                        <div class="tool" :loading="dt.downloadLoading">
+                        <div class="tool" v-loading="dt.downloadLoading" element-loading-spinner="el-icon-loading">
                             <div>选择导出</div>
                             <p>
                                 <el-dropdown style="cursor:pointer;font-size:16px;" @command="onExport">
@@ -156,22 +156,22 @@
             </el-table>
         </el-main>
         <el-footer>
-            <div class="toolbar">
+            <div class="toolbar" v-if="refreshEnable">
                 <el-button-group v-if="global && dt.summary">
                     <el-button
                         type="default"
                         v-for="(btn,key) in global.register.event.severity"
                         :key="key"
-                        :style="btn[2] | severityBtnStyle(dt.summary[key],dtOptions)"
+                        :style="btn[2] | severityBtnStyle(dt.summary.groupBySeverity[key],dtOptions)"
                         @click="onToggleSeverity(btn,key)"
                         :class="checkSeverity(key)">
-                        {{ btn[1] }} <span style="font-variant: all-mini-caps;">{{btn[0]}}</span> {{ dt.summary[key]?dt.summary[key].length:0 }}
+                        {{ btn[1] }} <span style="font-variant: all-mini-caps;">{{btn[0]}}</span> {{ dt.summary.groupBySeverity[key]?dt.summary.groupBySeverity[key]:0 }}
                     </el-button>
                 </el-button-group>
             </div>
             <div class="footbar">
-                {{ info.join(' &nbsp; | &nbsp;') }}
-                <span style="float:right;padding-right:10px;">
+                <span>{{ info.join(' &nbsp; | &nbsp;') }}</span>
+                <span style="float:right;padding-right:10px;" v-if="refreshEnable">
                     <countdown 
                         :left-time="60000"
                         @finish="onCountDownS" ref="vac" v-if="control.ifRefresh"> 
@@ -256,6 +256,10 @@ export default {
         model: Object,
         options: Object,
         height: String,
+        refreshEnable:{
+            type: Boolean,
+            default: false
+        },
         rowClass: {
             type: String,
             default: "event-console"
@@ -346,40 +350,42 @@ export default {
         }
     },
     watch: {
+        'model':{
+            handler(val){
+                this.info = [];
+                try{
+                    this.info.push(`共 ${val.summary.all} 项`);
+                }catch(err){
+                    this.info.push(`共 0 项`);
+                }
+                this.info.push(`已选择 ${this.dt.selected.length} 项`);
+                this.info.push(this.moment().format("YYYY-MM-DD HH:mm:ss.SSS"));
+            },
+            deep:true
+        },
+        'model.summary': {
+            handler(val){
+                this.dt.summary = val;
+            }
+        },
         'model.rows': {
             handler(val){
 
                 this.dt.pageNum = 0;
 
-                //this.dt.rows = [];
-
                 if(val){
-                    this.dt.summary = _.groupBy(val,'severity');
-
-                    this.info = [];
-                    this.info.push(`共 ${val.length} 项`);
-                    this.info.push(`已选择 ${this.dt.selected.length} 项`);
-                    this.info.push(this.moment().format("YYYY-MM-DD HH:mm:ss.SSS"));
-
                     this.initData();
                 }
-            },
-            immediate:true
+            }
         },
-        /* 'dt.rows': {
-            handler(val){
-                // if(_.isEmpty(val)) return false;
-                // this.info = [];
-                // this.info.push(`共 ${this.dt.rows.length} 项`);
-                // this.info.push(`已选择 ${this.dt.selected.length} 项`);
-                // this.info.push(this.moment().format("YYYY-MM-DD HH:mm:ss.SSS"));
-            },
-            immediate:true
-        }, */
         'dt.selected': {
             handler(val){
                 this.info = [];
-                this.info.push(`共 ${this.dt.rows.length} 项`);
+                try{
+                    this.info.push(`共 ${this.model.summary.all} 项`);
+                }catch(err){
+                    this.info.push(`共 0 项`);
+                }
                 this.info.push(`已选择 ${val.length} 项`);
                 this.info.push(this.moment().format("YYYY-MM-DD HH:mm:ss.SSS"));
             }
@@ -452,14 +458,15 @@ export default {
                 }
             };
             let rtn = "";
-            if(_.isEmpty(dt)){
-                rtn = `color:#ffffff;background:${ hexToRGB(color,0.3) };${!options.severityBar?'display:none;':''}`;
+            
+            if(_.isUndefined(dt)){
+                rtn = `color:#ffffff;background:${ hexToRGB(color,1) };${!options.severityBar?'display:none;':''}`;
             } else {
                 
-                if(dt.length > 0){
+                if(dt > 0){
                     rtn = `color:#ffffff;background:${ color };`;
                 } else {
-                    rtn = `color:#ffffff;background:${ hexToRGB(color,0.3) };${!options.severityBar?'display:none;':''}`;
+                    rtn = `color:#ffffff;background:${ hexToRGB(color,1) };${!options.severityBar?'display:none;':''}`;
                 }
 
             }
@@ -491,16 +498,22 @@ export default {
             // 变量scrollHeight是滚动条的总高度
             let scrollHeight = evt.target.scrollHeight;
             
-            //console.log(scrollTop, windowHeight, scrollHeight)
-
             // 脚底
             if (scrollTop + windowHeight === scrollHeight) {
                 this.onLoadMore(); 
+                this.$nextTick(()=>{
+                    this.$refs.table.doLayout();
+                })
             }
             
         })
     },
     methods: {
+        onLayout(){
+            this.$nextTick(()=>{
+                this.$refs.table.doLayout();
+            })
+        },
         checkSeverity(key){
             return _.includes(this.dt.selectedSeverity,key)?'severity-active':'';
         },
@@ -757,7 +770,9 @@ export default {
         },
         /* shift 多选 */
         onCurrentChange(row,oldRow){
+            
             try{
+                console.log(row,oldRow)
                 if(!oldRow) return false;
 
                 const data = this.dt.rows;
@@ -787,7 +802,7 @@ export default {
                     this.dt.selected = [];
                 }
             } catch(err){
-                console.log(err);
+                console.error(err);
             }
         },
         /* shift多选后，单点恢复样式 */
@@ -805,8 +820,8 @@ export default {
         onToggle(){
             this.$root.toggleModel(_.without(['view-normal','view-tags'],window.EVENT_VIEW).join(""));
         },
-        onExport(){
-            /* this.dt.downloadLoading = true;
+        onExport(type){
+            this.dt.downloadLoading = true;
             let formatJson = (filterVal, jsonData)=>{
                 return jsonData.map(v => filterVal.map(j => {
                     if (_.includes(['day','ctime','vtime'],j)) {
@@ -819,8 +834,8 @@ export default {
                 }));
             };
             import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = _.keys(_.head(this.dt.rows));
-                const data = formatJson(tHeader, this.dt.rows);
+                const tHeader = _.keys(_.head(this.model.rows));
+                const data = formatJson(tHeader, this.model.rows);
                 excel.export_json_to_excel({
                     header: tHeader,
                     data,
@@ -829,7 +844,7 @@ export default {
                     bookType: type
                 })
                 this.dt.downloadLoading = false;
-            }) */
+            })
             
         },
         openPanel(){
@@ -943,7 +958,7 @@ export default {
 
     .el-footer{
         height: auto!important;
-        padding: 5px 0 0 0;
+        padding: 0 0;
     }
 
     .el-footer > .toolbar {

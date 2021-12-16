@@ -1,5 +1,7 @@
 <template>
-  <el-container class="card-container">
+  <el-container class="card-container" 
+    v-loading="dt.loading"
+    element-loading-spinner="el-icon-loading">
     <el-header>
         <el-button type="default" icon="el-icon-refresh" @click="onRefresh">刷新</el-button>
         <el-button type="success" icon="el-icon-plus" @click="onNew">新建</el-button>
@@ -217,6 +219,7 @@ export default {
   data() {
     return {
       dt: {
+        loading:false,
         rows:[],
         selected: null
       },
@@ -270,10 +273,15 @@ export default {
   },
   methods: {
     initView(){
+      this.dt.loading = true;
       let param = encodeURIComponent(JSON.stringify({action:'getDefaultView'}));
       this.m3.callFS("/matrix/m3event/view/action.js",param).then(rtn=>{
         this.view.value = rtn.message;
         this.initData();
+        this.dt.loading = false;
+      }).catch(err=>{
+        console.error(err);
+        this.dt.loading = false;
       })
     },
     parseTrigger(data){
@@ -290,6 +298,7 @@ export default {
         });
     },
     initData(){
+        this.dt.loading = true;
         this.m3.trigger.list(this.view.value).then(rtn=>{
             this.dt.rows = [];
             let parse = this.parseTrigger(rtn.message[0]);
@@ -304,6 +313,10 @@ export default {
                     script: v.script
                 }
             });
+            this.dt.loading = false;
+        }).catch(err=>{
+          console.error(err);
+          this.dt.loading = false;
         })
         
     },

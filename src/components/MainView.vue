@@ -37,7 +37,7 @@
               </el-input>
             </el-header>
             <el-main class="event-console-el-main">
-              <EventList ref="eventList" :model="search.result.list" :options="search.result.options"
+              <EventList ref="eventList" :model="search.result.list" :refreshEnable="true" :options="search.result.options"
                 @onSearch="onSearch" 
                 @DiagnosisView="((data)=>{ addTab(data.row,data.menu) })"
                 @severity:change="onSearchBySeverity"
@@ -196,6 +196,7 @@ export default {
       } 
     },
     onToggleDefaultView(val){
+      
       let view = _.find(this.views.list,{label:val});
       let param = encodeURIComponent(JSON.stringify({  action: "setDefaultView", data: { key: 'defaultView', value: view.fullname } }));
       this.m3.callFS("/matrix/m3event/view/action.js", param).then(()=>{
@@ -205,10 +206,17 @@ export default {
           this.$refs.eventList.onRefresh();
           this.$refs.eventList.control.ifVoiceNotify = false;
           
-          setTimeout(()=>{
-            let ids = _.chain(this.$refs.eventList.model.rows).map('id').compact().uniq().value().slice(0,100);
-            this.eventHub.$emit("smartGroup-refresh", ids);
-          },1500)
+          this.$nextTick(()=>{
+            try{
+              if(this.search.result.list){
+                //let ids = _.chain(this.$refs.eventList.model.rows).map('id').compact().uniq().value().slice(0,100);
+                let ids = _.chain(this.search.result.list.rows).map('id').compact().uniq().value().slice(0,100);
+                this.eventHub.$emit("smartGroup-refresh", ids);
+              }
+            }catch(err){
+              console.error(err);
+            }
+          })
         })
     },
     initViews(){

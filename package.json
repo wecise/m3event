@@ -10,7 +10,7 @@
   "dependencies": {
     "@handsontable/vue": "^8.4.0",
     "@iarna/toml": "^2.2.5",
-    "@wecise/m3js": "^1.0.38",
+    "@wecise/m3js": "^1.0.184",
     "animate.css": "^4.1.1",
     "core-js": "^3.6.5",
     "dns": "^0.2.2",
@@ -48,6 +48,7 @@
     "babel-eslint": "^10.1.0",
     "babel-plugin-component": "^1.1.1",
     "compression-webpack-plugin": "^5.0.2",
+    "csvjson": "^5.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "image-webpack-loader": "^7.0.1",

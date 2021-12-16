@@ -1,16 +1,16 @@
 <template>
-  <el-container>
-    <el-header>
+  <el-container style="height: calc(100vh - 135px);">
+    <el-header style="height: 40px!important;line-height: 40px!important;position:relative;">
       <el-tooltip content="刷新">
         <el-button type="text" icon="el-icon-refresh" @click="onRefresh"></el-button>
       </el-tooltip>
-      <el-tooltip content="新建规则">
+      <el-tooltip content="新建策略">
         <el-button type="text" icon="el-icon-plus" @click="onNew"></el-button>
       </el-tooltip>
-      <!--el-tooltip content="导出规则">
+      <!--el-tooltip content="导出策略">
         <el-button type="text" icon="el-icon-upload2"></el-button>
       </el-tooltip>
-      <el-tooltip content="导入规则">
+      <el-tooltip content="导入策略">
         <el-button type="text" icon="el-icon-download"></el-button>
       </el-tooltip-->
     </el-header>
@@ -18,9 +18,11 @@
       <el-table
         :data="dt.rows"
         stripe
+        border
+        height="calc(100vh - 255px)"
         :row-class-name="rowClassName"
         style="width: 100%"
-        v-if="dt.rows.length > 0">
+        ref="table">
         <template v-for="(item,index) in dt.columns">
             <el-table-column 
                 :prop="item.field"
@@ -37,26 +39,14 @@
                         <TagView domain='notifyRule' :model.sync="scope.row.tags" :id="scope.row.id" :limit="1"></TagView>
                     </div>
                     
-                    <div style="height:30px;line-height:30px;" v-else-if="item.field === 'emails' || item.field === 'phones'">
-                        <el-select :value="scope.row[item.field]" v-if="scope.row[item.field]">
-                          <el-option
-                            v-for="subItem in scope.row[item.field].split(',')"
-                            :key="subItem"
-                            :label="subItem"
-                            :value="subItem">
-                          </el-option>
-                        </el-select>
+                    <div style="display:flex;flex-wrap:wrap;" v-else-if="item.field === 'people' || item.field === 'emails' || item.field === 'phones'">
+                        <el-tag v-for="(v,k) in JSON.parse(scope.row[item.field])" :key="k" v-if="scope.row[item.field]" style="margin:2px;">
+                          {{v}}
+                        </el-tag>
                     </div>
 
                     <div style="height:30px;line-height:30px;" v-else-if="item.field === 'rtype'">
-                        <el-select :value="scope.row[item.field][0]" v-if="scope.row[item.field]">
-                          <el-option
-                            v-for="subItem in scope.row[item.field]"
-                            :key="subItem"
-                            :label="subItem"
-                            :value="subItem">
-                          </el-option>
-                        </el-select>
+                        <el-tag v-for="subItem in scope.row[item.field]" :key="subItem" v-if="scope.row[item.field]">{{subItem}}</el-tag>
                     </div>
                     
                     <div v-html='item.render(scope.row, scope.column, scope.row[item.field], scope.$index)' 
@@ -70,44 +60,59 @@
                 </template>
             </el-table-column>
         </template>
-        <el-table-column label="操作" width="200">
-          <!-- <template slot="header">
-            <el-input
-              v-model="dt.search"
-              clearable
-              placeholder="关键字搜索"/>
-          </template> -->
+        <el-table-column label="操作" width="160" fixed="right">
+          <template slot="header" slot-scope="scope">
+              <el-input v-model="dt.search" clearable placeholder="关键字"></el-input>
+          </template>
           <template slot-scope="scope">
             <el-button type="text"  @click="onEdit(scope.row)"> 编辑</el-button>
-            <el-button type="text"  @click="onDelete(scope.row)"> 删除</el-button>
+            <el-button type="text"  @click="onDelete(scope.row)" :loading="loading"> 删除</el-button>
+            <el-switch v-model="scope.row['status']" 
+              active-color="#13ce66" 
+              inactive-color="#ff4949"
+              :active-value="1"
+              :inactive-value="0"
+              style="padding-left:10px;"
+              @change="onToggleStatus(scope.row)"></el-switch>
           </template>
         </el-table-column>
       </el-table>
+      <!-- 新建策略 -->
       <el-dialog
-        title="规则管理"
-        :visible.sync="dialog.rule.show"
+        title="新建策略"
+        :visible.sync="dialog.rule.new.show"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
         :append-to-body="true"
         class="notifyRule-dialog"
-        @show="init"
-        v-if="dialog.rule.show">
-        <el-form :model="dialog.rule.data"  :rules="dialog.rule.rules" ref="notifyRuleForm" label-width="100px">
-          <el-form-item label="名称" prop="name">
-           <el-input v-model="dialog.rule.data.name" :disabled="dialog.rule.action==='update'?true:false"></el-input>
+        @open="onOpen"
+        v-if="dialog.rule.new.show">
+        <el-form :model="dialog.rule.new.data"  :rules="dialog.rule.new.rules" ref="notifyRuleForm" label-width="100px">
+          <el-form-item label="策略名称" prop="name">
+           <el-input v-model="dialog.rule.new.data.name"></el-input>
           </el-form-item>
           <el-form-item label="接收人员" prop="persons">
             <el-cascader
-              v-model="dialog.rule.data.persons"
+              v-model="dialog.rule.new.data.persons"
               :options="persons.list"
               :props="persons.props"
-              clearable>              
+              clearable
+              filterable
+              style="width:100%;"
+              >              
               <template slot-scope="{ node, data }">
-                <span>{{ data.username }}</span>
+                <span v-if="data.username==='/'">{{m3.auth.Company.fullname}}</span>
+                <span v-else>{{ (data.firstname || "") + (data.lastname || "") ||  data.username }} 
+                    <span class="el-icon-platform-eleme" style="color:#999;font-size:8px;padding-left: 5px;" v-if="data.email"> {{ data.email.join(" ") }}</span>
+                    <span class="el-icon-phone" style="color:#999;font-size:8px;padding-left: 5px;" v-if="data.mobile"> {{ data.mobile.join(" ") }}</span>
+                    <span class="el-icon-message-solid" style="color:#999;font-size:8px;padding-left: 5px;" v-if="data.wechat"> {{ data.wechat }}</span>
+                </span>
                 <span v-if="!node.isLeaf && data.nodes.length>0"> ({{ data.nodes.length }})</span>
               </template>
               </el-cascader>
           </el-form-item>
-          <el-form-item label="类型" prop="rtype">
-            <el-select v-model="dialog.rule.data.rtype" multiple placeholder="请选择">
+          <el-form-item label="通知类型" prop="rtype">
+            <el-select v-model="dialog.rule.new.data.rtype" multiple placeholder="请选择" filterable style="width:100%;">
               <el-option
                 v-for="item in rtype.list"
                 :key="item.name"
@@ -118,45 +123,143 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="场景" prop="situation">
-            <el-select v-model="dialog.rule.data.situation" placeholder="请选择">
+          <el-form-item label="通知规则" prop="situation">
+            <el-select v-model="dialog.rule.new.data.situation" filterable placeholder="请选择">
               <el-option
                 v-for="item in situation.list"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id">
                 <span style="float: left">{{ item.name }}</span>
-                <span style="float: right; color: #8492a6; font-size: 8px">{{ item.status }}</span>
+                <span style="float: right; color: #8492a6; font-size: 8px">
+                  <span class="el-icon-tickets" style="color:#999;font-size:8px;padding-left: 5px;" v-if="item.situation"> {{ item.situation }}</span>
+                </span>
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="状态" prop="status">
-            <el-switch
-              v-model="dialog.rule.data.status"
-              active-color="#13ce66"
-              inactive-color="#dddddd"
-              :active-value="1"
-              :inactive-value="0">>
-            </el-switch>
-          </el-form-item>
-          <el-form-item label="模版" prop="template">
-            <el-select v-model="dialog.rule.data.template" placeholder="请选择">
+          <el-form-item label="通知模版" prop="template">
+            <el-select v-model="dialog.rule.new.data.template" value-key="fullname" filterable placeholder="请选择">
               <el-option
                 v-for="item in templates.list"
-                :key="item.name"
-                :label="item.name"
+                :key="item.fullname"
+                :label="item.title"
                 :value="item">
                 <span style="float: left">{{ item.name | formatName }}</span>
               </el-option>
             </el-select>
           </el-form-item>
+        
+          <el-form-item label="状态" prop="status">
+              <el-switch
+                v-model="dialog.rule.new.data.status"
+                active-color="#13ce66"
+                inactive-color="#dddddd"
+                :active-value="1"
+                :inactive-value="0">
+              </el-switch>
+          </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="dialog.rule.show = false">取 消</el-button>
-          <el-button type="primary" @click="onSave">确 定</el-button>
+          <el-button @click="dialog.rule.new.show = false">取 消</el-button>
+          <el-button type="primary" @click="onSave" :loading="dialog.rule.new.loading">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- 策略管理 -->
+      <el-dialog
+        title="策略管理"
+        :visible.sync="dialog.rule.edit.show"
+        :append-to-body="true"
+        class="notifyRule-dialog"
+        @open="onOpen"
+        v-if="dialog.rule.edit.show">
+        <el-form :model="dialog.rule.edit.data"  :rules="dialog.rule.edit.rules" ref="notifyRuleForm" label-width="100px">
+          <el-form-item label="名称" prop="name">
+           <el-input v-model="dialog.rule.edit.data.name" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="接收人员" prop="persons">
+            <el-cascader
+              v-model="dialog.rule.edit.data.persons"
+              :options="persons.list"
+              :props="persons.props"
+              clearable
+              filterable
+              style="width:100%;">              
+              <template slot-scope="{ node, data }">
+                <span v-if="data.username==='/'">{{m3.auth.Company.fullname}}</span>
+                <span v-else>{{ (data.firstname || "") + (data.lastname || "") ||  data.username }} 
+                    <span class="el-icon-platform-eleme" style="color:#999;font-size:8px;padding-left: 5px;" v-if="data.email"> {{ data.email.join(" ") }}</span>
+                    <span class="el-icon-phone" style="color:#999;font-size:8px;padding-left: 5px;" v-if="data.mobile"> {{ data.mobile.join(" ") }}</span>
+                    <span class="el-icon-message-solid" style="color:#999;font-size:8px;padding-left: 5px;" v-if="data.wechat"> {{ data.wechat }}</span>
+                </span>
+                <span v-if="!node.isLeaf && data.nodes.length>0"> ({{ data.nodes.length }})</span>
+              </template>
+              </el-cascader>
+          </el-form-item>
+          <el-form-item label="通知类型" prop="rtype">
+            <el-select v-model="dialog.rule.edit.data.rtype" multiple placeholder="请选择" style="width:100%;" filterable>
+              <el-option
+                v-for="item in rtype.list"
+                :key="item.name"
+                :label="item.title"
+                :value="item.name">
+                <span style="float: left">{{ item.title }}</span>
+                <span style="float: right; color: #8492a6; font-size: 8px">{{ item.address }}:{{item.port}}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="通知规则" prop="situation">
+            <el-input placeholder="选择通知规则" :value="situation.list,dialog.rule.edit.data.situation | getSituationName">
+                  <template slot="prepend">
+                    <i class="el-icon-tickets"></i>
+                    <el-select v-model="dialog.rule.edit.data.situation" value-key="id" placeholder="请选择" filterable style="width:47px;">
+                      <el-option
+                        v-for="item in situation.list"
+                        :key="item.id"
+                        :value="item.id">
+                        <span style="float: left">{{ item.name }}</span>
+                        <span style="float: right; color: #8492a6; font-size: 8px">
+                          <span class="el-icon-tickets" style="color:#999;font-size:8px;padding-left: 5px;" v-if="item.situation"> {{ item.situation }}</span>
+                        </span>
+                      </el-option>
+                    </el-select>
+                  </template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="通知模版" prop="template">
+            <el-input placeholder="选择通知模版" :value="dialog.rule.edit.data.template.title" v-if="dialog.rule.edit.data.template">
+                  <template slot="prepend">
+                    <i class="el-icon-notebook-2"></i>
+                    <el-select v-model="dialog.rule.edit.data.template" value-key="name" placeholder="请选择" filterable style="width:47px;">
+                      <el-option
+                        v-for="item in templates.list"
+                        :key="item.name"
+                        :value="item">
+                        <span style="float: left">{{ item.title }}</span>
+                      </el-option>
+                    </el-select>
+                  </template>
+              </el-input>
+          </el-form-item>
+        
+          <el-form-item label="状态" prop="status">
+              <el-switch
+                v-model="dialog.rule.edit.data.status"
+                active-color="#13ce66"
+                inactive-color="#dddddd"
+                :active-value="1"
+                :inactive-value="0">
+              </el-switch>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialog.rule.edit.show = false">取 消</el-button>
+          <el-button type="primary" @click="onUpdate" :loading="dialog.rule.edit.loading">更 新</el-button>
         </span>
       </el-dialog>
     </el-main>
+    <el-footer style="height:40px;line-height:40px;background:#f2f2f2;">
+        {{ dt.info.join(' &nbsp; | &nbsp;') }}
+    </el-footer>
   </el-container>
 </template>
 
@@ -168,11 +271,13 @@ export default {
   name: "NotifyRuleView",
   data() {
     return {
+      loading: false,
       dt: {
         rows:[],
         columns: [],
         selected: [],
-        search: ""
+        search: "",
+        info:[]
       },
       rtype: {
         list: [
@@ -194,22 +299,26 @@ export default {
       persons: {
         props: {
           value: 'id',
-          label: 'username',
+          label: 'flname',
           children: 'nodes',
           multiple: true,
           emitPath: false,
           checkStrictly: true
         },
-        list: []
+        list: [],
+        userList: []
       },
       situation:{
         list: []
       },
       templates: {
+        value: '',
         list: []
       },
       dialog:{
         rule:{
+          new:{
+            loading: false,
             show: false,
             data: {
               name: "",
@@ -223,8 +332,25 @@ export default {
                 name:[
                   { required: true, message: '请输入名称', trigger: 'blur' }
                 ]
+            }
+          },
+          edit:{
+            loading: false,
+            show: false,
+            data: {
+              name: "",
+              persons: null,
+              rtype: "",
+              situation: null,
+              status: 0,
+              template: null
             },
-            action: "add"            
+            rules: {
+                name:[
+                  { required: true, message: '请输入名称', trigger: 'blur' }
+                ]
+            }
+          }
         }
       }
     };
@@ -235,6 +361,9 @@ export default {
     },
     formatTime(val){
       return window.moment(val).format(window.global.register.format);
+    },
+    getSituationName(situations,val){
+      return _.find(situations,{id:val}).name;
     }
   },
   components:{
@@ -246,10 +375,39 @@ export default {
         if(_.isEmpty(val)){
           this.initData();
         }else {
-          this.dt.rows = this.dt.rows.filter(data => !val || data.name.toLowerCase().includes(val.toLowerCase()))
+          this.dt.rows = this.dt.rows.filter(data => {
+              return !val || data.name.toLowerCase().includes(val.toLowerCase()) || data.emails.includes(val.toLowerCase()) || data.phones.includes(val.toLowerCase())
+          })
         }
       }
-    }
+    },
+    'dialog.rule.show'(val){
+        if(val){
+          this.init();
+        }
+    },
+    'dt.rows': {
+          handler(val){
+
+              if(val){
+                  
+                  this.dt.info = [];
+                  this.dt.info.push(`共 ${val.length} 项`);
+                  this.dt.info.push(`已选择 ${this.dt.selected.length} 项`);
+                  this.dt.info.push(this.moment().format("YYYY-MM-DD HH:mm:ss.SSS"));
+
+              }
+          },
+          immediate:true
+      },
+      'dt.selected': {
+          handler(val){
+              this.dt.info = [];
+              this.dt.info.push(`共 ${this.dt.rows.length} 项`);
+              this.dt.info.push(`已选择 ${val.length} 项`);
+              this.dt.info.push(this.moment().format("YYYY-MM-DD HH:mm:ss.SSS"));
+          }
+      }
   },
   created(){
      this.initData();
@@ -258,6 +416,7 @@ export default {
   methods: {
     initData(){
       this.m3.callFS("/matrix/m3event/notify/getRuleList.js").then((rt)=>{
+        
         let rtn = rt.message;
 
         this.$set(this.dt,'rows', rtn.rows);
@@ -274,30 +433,60 @@ export default {
           }
           
         }));
+
+        this.$nextTick(()=>{
+          this.$refs.table.doLayout();
+        })
+        setTimeout(()=>{
+          this.$refs.table.doLayout();
+        },1000)
       })
     },
+    // 递归判断列表，把最后的children设为undefined
+    travelUserTree(data){
+      
+      for(var i=0;i<data.length;i++){
+        data[i].flname = (data[i]['firstname'] || "")+(data[i]['lastname'] || "") || data[i]['username'];
+        if(data[i].nodes.length<1){
+          data[i].nodes = undefined;
+        }else {
+          this.travelUserTree(data[i].nodes);
+        } 
+      }
+      return data;
+    },
     init(){
+
+      this.m3.callFS("/matrix/m3system/ldap/ldap.js").then(rtn=>{
+          this.persons.userList = rtn.message;
+      })
+
       this.m3.user.list().then(rtn=>{
-        this.persons.list = [rtn.message];
+        this.persons.list = this.travelUserTree(rtn.message.nodes);
       })
 
       this.m3.callFS("/matrix/m3event/notify/getTemplateList.js").then(rtn=>{
-        this.templates.list = rtn.message.rows;
+        this.templates.list = _.map(rtn.message.rows,v=>{
+          return {name:v.name, value: {[v.name]:v.fullname}, title: v.name.replace(/.json/,'')};
+        });
       })
 
       let param = encodeURIComponent( JSON.stringify({action:'list'}) );
-      this.m3.callFS("/matrix/m3event/notify/situationAction.js",param).then(res=>{
-        this.situation.list = res.message.rows;
+      this.m3.callFS("/matrix/m3event/notify/situationAction.js",param).then(rtn=>{
+        this.situation.list = rtn.message.rows;
       })
     },
     rowClassName({rowIndex}){
-        return `row-${rowIndex}`;
+        return `notifyRule-row-${rowIndex}`;
+    },
+    onOpen(){
+      this.init();
     },
     onRefresh(){
       this.initData();
     },
-    onReset(){
-      this.dialog.rule.data = {
+    onReset(form){
+      this.dialog.rule[form].data = {
                                 name: "",
                                 persons: [],
                                 rtype: "",
@@ -307,82 +496,161 @@ export default {
                               };
     },
     onNew(){
-      this.dialog.rule.show = true;
-      this.dialog.rule.action = "add";
-      this.onReset();
+      this.dialog.rule.new.show = true;
+      _.extend(this.dialog.rule.new.data,{template:{title:""}});
+      this.onReset('new');
     },
     onSave(){
 
         let param = encodeURIComponent(JSON.stringify({
-                    action: this.dialog.rule.action,
-                    model: this.dialog.rule.data
+                    action: 'add',
+                    model: this.dialog.rule.new.data
                   }));
         
-        if(_.isEmpty(this.dialog.rule.data.name)){
+        if(_.isEmpty(this.dialog.rule.new.data.name)){
           this.$message.warning("请输入名称");
           return false;
         }
 
-        if(_.isEmpty(this.dialog.rule.data.persons)){
+        if(_.isEmpty(this.dialog.rule.new.data.persons)){
           this.$message.warning("请选择接收人员");
           return false;
         }
 
-        if(_.isEmpty(this.dialog.rule.data.situation)){
+        if(_.isEmpty(this.dialog.rule.new.data.situation)){
           this.$message.warning("请选择场景");
           return false;
         }
 
-        if(_.isEmpty(this.dialog.rule.data.template)){
+        if(_.isEmpty(this.dialog.rule.new.data.template)){
           this.$message.warning("请选择通知内容模版");
           return false;
         }
+
+        this.dialog.rule.new.loading = true;
 
         this.m3.callFS("/matrix/m3event/notify/ruleAction.js",param).then(()=>{
           
           this.$message({
             type: "success",
-            message: "新建规则成功！"
+            message: "新建策略成功"
           })
+          this.onReset('new');
           this.initData();
-          this.onReset();
-          this.dialog.rule.show = false;
+          this.dialog.rule.new.loading = false;
+          this.dialog.rule.new.show = false;
 
+        }).catch(err=>{
+          this.$message({
+            type: "error",
+            message: "新建策略失败 " + err
+          })
         });
     },
     onDelete(item){
-      this.$confirm(`确认要删除该规则：${item.name}？`, '提示', {
+      
+      this.$confirm(`确认要删除该策略：${item.name}？`, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'error'
                     }).then(() => {
         
+        this.loading = true;
+
         let param = encodeURIComponent(JSON.stringify({action:"delete",model:item}));
+
         this.m3.callFS("/matrix/m3event/notify/ruleAction.js",param).then(()=>{
           
           this.$message({
                 type: 'success',
-                message: '删除规则成功!'
+                message: '删除策略成功!'
           })
 
           this.initData();
+          this.loading = false;
 
         }).catch((err)=>{
           
           this.$message({
               type: 'error',
-              message: '删除规则失败 ' + err.message
+              message: '删除策略失败 ' + err.message
           });
+
+          this.loading = false;
 
         });
           
       })
     },
     onEdit(item){
-      this.dialog.rule.data = item;
-      this.dialog.rule.data.template = _.find(this.templates.list, {fullname: _.values(item.template)[0]});
-      this.dialog.rule.action = "update";
-      this.dialog.rule.show = true;
+      this.dialog.rule.edit.data = _.cloneDeep(item);
+      _.extend(this.dialog.rule.edit.data, {template: _.find(this.templates.list, {name: _.keys(item.template)[0]})});
+      this.dialog.rule.edit.show = true;
+    },
+    onUpdate(){
+
+        let param = encodeURIComponent(JSON.stringify({
+                    action: 'update',
+                    model: this.dialog.rule.edit.data
+                  }));
+        
+        if(_.isEmpty(this.dialog.rule.edit.data.name)){
+          this.$message.warning("请输入名称");
+          return false;
+        }
+
+        if(_.isEmpty(this.dialog.rule.edit.data.persons)){
+          this.$message.warning("请选择接收人员");
+          return false;
+        }
+
+        if(_.isEmpty(this.dialog.rule.edit.data.situation)){
+          this.$message.warning("请选择场景");
+          return false;
+        }
+
+        if(_.isEmpty(this.dialog.rule.edit.data.template)){
+          this.$message.warning("请选择通知内容模版");
+          return false;
+        }
+
+        this.dialog.rule.edit.loading = true;
+
+        this.m3.callFS("/matrix/m3event/notify/ruleAction.js",param).then(res=>{
+          this.$message({
+            type: "success",
+            message: "策略更新成功"
+          })
+          this.initData();
+          this.dialog.rule.edit.loading = false;
+          this.dialog.rule.edit.show = false;
+
+        }).catch(err=>{
+          this.$message({
+            type: "error",
+            message: "策略更新失败 " + err
+          })
+          this.dialog.rule.edit.loading = false;
+        });
+    },
+    onToggleStatus(row){
+      
+      let template = _.find(this.templates.list, {value:row.template});
+
+      this.$set(row,'template',template);
+
+      let param = encodeURIComponent(JSON.stringify({
+                    action: 'update',
+                    model: row
+                  }));
+      this.m3.callFS("/matrix/m3event/notify/ruleAction.js",param).then(()=>{
+          
+          this.$message({
+            type: row.status ? "success" : "info",
+            message: row.status ? "策略已启用" : "策略已停止"
+          })
+
+      });
     }
   }
 };
@@ -390,27 +658,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .el-container{
-    height: calc(100vh - 220px)!important;
-  }
-  .el-header{
-    height:40px!important;
-    line-height:40px;
-  }
+  
   .el-main{
-    padding:0px;
     overflow: hidden;
   }
   
-  
-</style>
-
-<style>
-  .notifyRule-dialog .el-dialog{
+  .notifyRule-dialog /deep/ .el-dialog{
     width: 70vw!important;
     height: auto;
   }
-  .el-table__body .el-input__inner{
+  .el-table__body /deep/ .el-input__inner{
     border:unset!important;
   }
 </style>

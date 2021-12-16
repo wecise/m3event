@@ -70,19 +70,19 @@
                                 ></VueEditor>
                             </el-main>
                         </el-container>
-                        <el-button type="text" slot="reference">
-                            <svg-icon icon-class="clipboard" style="width: 1.1em;height: 1.1em; padding-left:10px;"/>
+                        <el-button type="text" slot="reference" style="padding-left:15px;">
+                            <svg-icon icon-class="clipboard" style="width: 1.1em;height: 1.1em;"/>
                         </el-button>
                     </el-popover>
                     
-                    <!-- <el-tooltip content="文件导入" >
-                        <el-button type="text" @click="onUploadFromFile" style="padding-left:10px;">
+                    <el-tooltip content="转存为JSON" >
+                        <el-button type="text" @click="onSaveAsJson" style="padding-left:15px;" :loading="loading.saveAsJson">
                             <svg-icon icon-class="documentation" style="width: 1.0em; height: 1.0em;"/>
                         </el-button>
-                    </el-tooltip> -->
+                    </el-tooltip>
 
                     <el-tooltip content="保存" >
-                        <el-button type="text" @click="onApplyPolicy" :loading="policy.loading" style="padding-left:10px;">
+                        <el-button type="text" @click="onApplyPolicy" :loading="policy.loading" style="padding-left:15px;">
                             <svg-icon icon-class="save" style="width: 1.2em;height: 1.2em;"/>
                         </el-button>
                     </el-tooltip>
@@ -233,8 +233,8 @@
 import _ from 'lodash';
 import TagView from '../tags/TagView';
 import Papa from 'papaparse';
-import Handsontable from 'handsontable';
 import { HotTable } from '@handsontable/vue';
+import Handsontable from 'handsontable';
 
 
 export default {
@@ -290,7 +290,7 @@ export default {
                 rowHeaders: true,
                 colHeaders: true,
                 autoWrapRow: false,
-                minRows: 50,
+                minRows: 5,
                 autoRowSize: true,
                 autoColumnSize: true,
                 stretchH: 'all',
@@ -374,6 +374,9 @@ export default {
                 },
                 fileList: []
             }
+        },
+        loading:{
+            saveAsJson:false
         }
     };
   },
@@ -592,7 +595,7 @@ export default {
     
         let param = {
                       parent: this.model.parent, name: this.model.name, 
-                      data: { content: content, type: this.model.ftype, attr: this.model.attr, index: true }    
+                      data: { content: content, ftype: this.model.ftype, attr: this.model.attr, index: true }    
                     };
         
         this.m3.dfs.write(param).then(()=>{
@@ -615,6 +618,48 @@ export default {
     onToggleTheme(val){
         require(`brace/theme/${val}`); //language
         this.editor.theme.value = val;
+    },
+    /* 将表格另存为JSON /etc/extend/json */
+    onSaveAsJson(){
+        this.loading.saveAsJson = true;
+
+        let parent = "/etc/extend/json";
+        let ftype = "json";
+        let name = this.model.name.split(".")[0];
+        let csvjson = require('csvjson');
+        let csv = Papa.unparse(this.$refs.hotTableComponent.hotInstance.getSourceData(),{ 
+                                delimiter: this.policy.config.delimiter,
+                                skipEmptyLines: true });
+        let data = _.compact(this.$refs.hotTableComponent.hotInstance.getSourceData());
+        let headers = data?data[0]:[];
+        console.log(data, typeof data)
+        let content = csvjson.toObject(csv, {
+                                                headers : headers.join(this.policy.config.delimiter),
+                                                delimiter : this.policy.config.delimiter,
+                                                quote     : '"'
+                                            });
+        
+        
+        let param = {
+                      parent: parent, name: [name,ftype].join("."), 
+                      data: { content: JSON.stringify(content,null,2), ftype: ftype, attr: {}, index: true }    
+                    };
+
+        
+        
+        this.m3.dfs.write(param).then(()=>{
+            this.$message({
+              type: "success",
+              message: "另存为成功"
+            })  
+            this.loading.saveAsJson = false;
+        }).catch((err)=>{
+            this.$message({
+              type: "error",
+              message: "另存为失败 " + err.message
+            })
+            this.loading.saveAsJson = false;
+        })
     }
   }
 };
@@ -643,7 +688,7 @@ export default {
         display: none!important;
     }
     .htMenu.htContextMenu.handsontable{
-        z-index: 3000;
+        z-index: 30000;
     }
 </style>
 <style src="../../../node_modules/handsontable/dist/handsontable.full.min.css"></style>

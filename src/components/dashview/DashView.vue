@@ -6,7 +6,8 @@
                 <TagTreeView :model="{domain:'dashview'}" :fun="onRefreshByTag" ref="dashviewTagTree"></TagTreeView>
             </SplitArea>
             <SplitArea :size="85" :minSize="0" style="overflow:hidden;">
-              <el-container style="height: calc(100vh - 130px);">
+              <el-container style="height: calc(100vh - 130px);" v-loading="dt.loading"
+                  element-loading-spinner="el-icon-loading">
                 <el-header style="line-height: 60px;">
                     <el-button type="default" icon="el-icon-refresh" @click="onRefresh">刷新</el-button>
                     <el-button type="success" icon="el-icon-plus" @click="onNew">新建</el-button>
@@ -88,6 +89,7 @@ export default {
   data() {
     return {
       dt: {
+        loading: false,
         rows:[],
         selected: null
       },
@@ -112,10 +114,15 @@ export default {
   },
   methods: {
     initData(){
+        this.dt.loading = true;
         let param = encodeURIComponent(JSON.stringify({  action: "list"  }));
         this.m3.callFS("/matrix/m3event/view/action.js", param).then((rtn)=>{
             this.dt.rows = _.orderBy(rtn.message,['name','ctime'],['asc','desc']);
             this.edit.show = false;
+            this.dt.loading = false;
+        }).catch(err=>{
+          console.error(err);
+          this.dt.loading = false;
         })
     },
     onRefresh(){

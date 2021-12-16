@@ -50,6 +50,9 @@ module.exports = m3config({
             },
             "/mxobject":{
                 target: `http://${process.env.VUE_APP_M3_HOST}`
+            },
+            "/consolelog":{
+                target: `http://${process.env.VUE_APP_M3_HOST}`
             }
         }
     },

@@ -8,7 +8,6 @@
             :props="defaultProps"
             @change="onChange"
             collapseTags
-            clearable
             filterable
             ref="cascader"
             style="margin-left:20px;">

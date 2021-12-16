@@ -186,7 +186,7 @@ export default {
             require(`brace/theme/${this.editor.theme.value}`); //language
         },
         onLoad(){
-            let param = {type:this.logType, name: this.fullname.replace(/\/script/g,""),param:this.consolelog, class: this.ownerClass};
+            let param = {type:this.logType, name: this.fullname.replace(/\/script/g,""), param:this.consolelog, class: this.ownerClass};
             this.m3.consolelog.trace(param).then( (rtn)=>{
                 this.dt.rows = rtn.message.logs;
             })

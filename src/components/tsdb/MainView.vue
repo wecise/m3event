@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container style="height: calc(100vh - 201px);">
     <el-header style="display:none;">
       <entity-view 
         @bucket-selected="((data)=>{ onSetBucket(data); })"
@@ -67,9 +67,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .el-container{
-    height: calc(100vh - 190px);
-  }
+  
   .el-header{
     line-height: 60px;
   }

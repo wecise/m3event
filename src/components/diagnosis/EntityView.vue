@@ -1,17 +1,5 @@
 <template>
-  <!-- <el-container> -->
-    <!--el-aside>
-        <el-container>
-            <el-header></el-header>
-            <el-main>
-                 <ul class="infinite-list" style="overflow:auto">
-                    <li :key="item" v-for="item in model" class="infinite-list-item">{{ item }}</li>
-                </ul>
-            </el-main>
-        </el-container>
-    </el-aside-->
     <el-container>
-        <el-header></el-header>
         <el-main>
             <el-card class="box-card" :key="k" v-for="(v,k) in groupedEntity">
                 <div slot="header" class="clearfix">
@@ -25,7 +13,6 @@
                 
             </el-card>
         </el-main>
-    <!-- </el-container> -->
   </el-container>
 </template>
 
